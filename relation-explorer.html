@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>应用题探险家 · 北师大版四年级《数量关系》</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { font-family:"PingFang SC","Microsoft YaHei",sans-serif; background:linear-gradient(160deg,#e8f4fd 0%,#fdf6ec 100%); min-height:100vh; color:#333; }
+  .container { max-width:840px; margin:0 auto; padding:20px 16px 60px; }
+  h1 { text-align:center; font-size:28px; margin:18px 0 6px; color:#2b6cb0; }
+  .subtitle { text-align:center; color:#888; font-size:14px; margin-bottom:24px; }
+  .card { background:#fff; border-radius:20px; padding:24px; box-shadow:0 6px 24px rgba(43,108,176,.10); margin-bottom:20px; }
+  .levels { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; }
+  .level-btn { border:none; border-radius:18px; padding:20px 14px; cursor:pointer; font-size:17px; font-weight:bold; color:#fff; transition:transform .15s, box-shadow .15s; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .level-btn:hover { transform:translateY(-4px); box-shadow:0 10px 20px rgba(0,0,0,.15); }
+  .level-btn .icon { font-size:36px; }
+  .level-btn .desc { font-size:12px; font-weight:normal; opacity:.92; }
+  .l1 { background:linear-gradient(135deg,#4776e6,#24c6dc); }
+  .l2 { background:linear-gradient(135deg,#f7971e,#ffd200); }
+  .l3 { background:linear-gradient(135deg,#f857a6,#c9184a); }
+  .card-btn { background:linear-gradient(135deg,#2b6cb0,#185a9d); width:100%; }
+  .tip { margin-top:12px; background:#fff8e6; border-left:4px solid #f7b733; padding:10px 14px; border-radius:8px; font-size:14px; line-height:1.8; }
+  .hidden { display:none !important; }
+  .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .badge { background:#e8f4fd; color:#2b6cb0; border-radius:12px; padding:5px 14px; font-size:14px; font-weight:bold; }
+  .progress { height:8px; background:#eef2f7; border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,#4776e6,#24c6dc); width:0%; transition:width .4s; }
+  .bignum { font-size:24px; font-weight:bold; color:#185a9d; text-align:center; letter-spacing:1px; margin:14px 0; word-break:break-all; }
+  .options { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .opt-btn { border:2px solid #d8e8f5; background:#f4f9fd; border-radius:14px; padding:13px 22px; font-size:16px; font-weight:bold; color:#2b6cb0; cursor:pointer; transition:all .15s; line-height:1.5; }
+  .opt-btn:hover { border-color:#4776e6; background:#eaf3fd; transform:scale(1.03); }
+  .opt-btn.correct { background:#e6f9ee; border-color:#2fb56b; color:#1d7a4a; }
+  .opt-btn.wrong { background:#fdeaea; border-color:#e06060; color:#b83232; }
+  .feedback { text-align:center; min-height:52px; margin-top:14px; font-size:15px; line-height:1.7; }
+  .feedback.ok { color:#1d7a4a; font-weight:bold; }
+  .feedback.no { color:#b83232; font-weight:bold; }
+  .big-btn { display:block; margin:18px auto 0; border:none; border-radius:14px; background:linear-gradient(135deg,#4776e6,#24c6dc); color:#fff; font-size:17px; font-weight:bold; padding:13px 40px; cursor:pointer; box-shadow:0 4px 14px rgba(71,118,230,.35); transition:transform .15s; }
+  .big-btn:hover { transform:scale(1.05); }
+  .back-btn { background:none; border:1.5px solid #c8d6e8; color:#7a8ba3; border-radius:10px; padding:6px 16px; font-size:13px; cursor:pointer; }
+  .small-btn { border:1.5px solid #c8d6e8; background:#f4f9fd; color:#2b6cb0; border-radius:10px; padding:8px 18px; font-size:14px; cursor:pointer; margin:0 4px; }
+  .result-stars { text-align:center; font-size:52px; margin-bottom:8px; }
+  .result-title { text-align:center; font-size:24px; font-weight:bold; color:#2b6cb0; margin-bottom:6px; }
+  .result-score { text-align:center; font-size:16px; color:#666; margin-bottom:16px; }
+  .wrong-item { background:#fdf6f6; border:1.5px solid #f0d6d6; border-radius:14px; padding:14px 16px; margin-bottom:14px; }
+  .ansline { transition:filter .25s; }
+  .hide-ans .ansline { filter:blur(7px); pointer-events:none; }
+  #sound-toggle { position:fixed; top:14px; right:14px; z-index:99; border:1.5px solid #c8d6e8; background:#fff; border-radius:50%; width:46px; height:46px; font-size:21px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,.10); }
+  .pop-score { position:fixed; left:50%; top:38%; transform:translateX(-50%); font-size:32px; font-weight:bold; color:#ff9a56; pointer-events:none; z-index:98; text-shadow:0 2px 10px rgba(255,154,86,.45); animation:popUp 1.1s ease-out forwards; }
+  @keyframes popUp { 0%{opacity:0;transform:translate(-50%,12px) scale(.6);} 25%{opacity:1;transform:translate(-50%,0) scale(1.18);} 100%{opacity:0;transform:translate(-50%,-52px) scale(1);} }
+  .confetti { position:fixed; top:-34px; font-size:22px; pointer-events:none; z-index:97; animation:fall linear forwards; }
+  @keyframes fall { to { transform:translateY(108vh) rotate(360deg); opacity:.65; } }
+  .seg { max-width:480px; margin:12px auto 4px; }
+  .seg-top { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:bold; color:#b85c1d; padding:0 4px 4px; }
+  .seg-top .dist { color:#185a9d; }
+  .seg-bar { height:12px; border-radius:6px; background:linear-gradient(90deg,#4a90d9 0%,#4a90d9 var(--split,50%),#f857a6 var(--split,50%),#f857a6 100%); }
+  .seg-ends { display:flex; justify-content:space-between; font-size:13px; color:#666; margin-top:5px; padding:0 2px; }
+  .seg-track { position:relative; height:36px; }
+  .seg-track .seg-bar { position:absolute; left:0; right:0; top:12px; }
+  .car { position:absolute; top:-7px; font-size:24px; line-height:1; user-select:none; }
+  .car-a { left:0; transform:scaleX(-1); }
+  .car-b { left:100%; transform:translateX(-100%); }
+  .seg-track.run .car-a { animation:driveA var(--dur,1.6s) linear forwards; }
+  .seg-track.run .car-b { animation:driveB var(--dur,1.6s) linear forwards; }
+  @keyframes driveA { from { left:0; } to { left:calc(var(--meet,50%) - 26px); } }
+  @keyframes driveB { from { left:100%; } to { left:calc(var(--meet,50%) + 26px); } }
+  .meet-flash { position:absolute; top:2px; left:var(--meet,50%); transform:translateX(-50%); font-size:20px; opacity:0; }
+  .seg-track.run .meet-flash { animation:flashIn var(--dur,1.6s) linear forwards; }
+  @keyframes flashIn { 0%,96% { opacity:0; transform:translateX(-50%) scale(.5); } 100% { opacity:1; transform:translateX(-50%) scale(1.25); } }
+  .replay-btn { display:block; margin:8px auto 0; border:1.5px solid #c8d6e8; background:#f4f9fd; color:#2b6cb0; border-radius:10px; padding:6px 18px; font-size:13px; cursor:pointer; }
+  .replay-btn:hover { border-color:#4776e6; background:#eaf3fd; }
+</style>
+</head>
+<body>
+<div class="container">
+  <button id="sound-toggle" onclick="toggleSound()" title="音效开关">🔊</button>
+  <h1>🚄 应用题探险家</h1>
+  <div class="subtitle">北师大版 · 数学四年级 · 数量关系：路程·时间·速度 ＋ 相遇问题 ＋ 单价·数量·总价 · 玩中学</div>
+
+  <!-- ============ 首页 ============ -->
+  <div id="home">
+    <div class="card">
+      <div class="levels">
+        <button class="level-btn l1" onclick="startGame(1)"><span class="icon">🚄</span>基础行程<span class="desc">速度×时间=路程，给俩求仨</span></button>
+        <button class="level-btn l2" onclick="startGame(2)"><span class="icon">🛒</span>单价总价<span class="desc">单价×数量=总价，购物应用题</span></button>
+        <button class="level-btn l3" onclick="startGame(3)"><span class="icon">🤝</span>相遇问题<span class="desc">速度和×时间=总路程，线段图</span></button>
+      </div>
+      <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">行程三公式 + 速度复合单位 + 相遇问题</span></button>
+      <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
+    </div>
+  </div>
+
+  <!-- ============ 秘籍卡 ============ -->
+  <div id="knowledge" class="hidden">
+    <div class="card">
+      <h2 style="text-align:center;color:#2b6cb0;margin-bottom:14px">📖 数量关系秘籍卡</h2>
+      <div class="tip">
+        🧮 <b>总量与分量：</b>总量 = 分量 + 分量；分量 = 总量 − 另一个分量。部分量相加是总量，总量相减出分量。<br>
+        🚄 <b>行程三公式：</b><b>速度 × 时间 = 路程</b>；<b>路程 ÷ 时间 = 速度</b>；<b>路程 ÷ 速度 = 时间</b>。<br>
+        ⚠️ <b>速度是复合单位：</b>每小时 70 千米要写成 <b>70 千米/时</b>，每分钟 60 米写成 <b>60 米/分</b>——不能只写"千米""米"！<br>
+        🛒 <b>购物三公式：</b><b>单价 × 数量 = 总价</b>；<b>总价 ÷ 数量 = 单价</b>；<b>总价 ÷ 单价 = 数量</b>。<br>
+        🤝 <b>相遇问题（期末大题）：</b>前提是<b>同时出发、两地、相向而行（面对面走）</b>。<br>
+        ① <b>速度和 × 相遇时间 = 总路程</b>；② 总路程 ÷ 速度和 = 相遇时间；③ 总路程 ÷ 相遇时间 = 速度和。<br>
+        📝 解题先<b>画线段图</b>：甲走的 + 乙走的 = 总路程；或 (甲速度+乙速度) × 时间 = 总路程。
+      </div>
+      <button class="big-btn" onclick="showHome()">我知道啦，去闯关！🚀</button>
+    </div>
+  </div>
+
+  <!-- ============ 游戏 1：基础行程 ============ -->
+  <div id="game1" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g1-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g1-score">0</span></span>
+        <span class="badge hidden" id="g1-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g1-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g1-question"></p>
+      <div class="options" id="g1-options"></div>
+      <div class="feedback" id="g1-fb"></div>
+      <button class="big-btn hidden" id="g1-next" onclick="g1Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ============ 游戏 2：单价总价 ============ -->
+  <div id="game2" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g2-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g2-score">0</span></span>
+        <span class="badge hidden" id="g2-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g2-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g2-question"></p>
+      <div class="options" id="g2-options"></div>
+      <div class="feedback" id="g2-fb"></div>
+      <button class="big-btn hidden" id="g2-next" onclick="g2Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ============ 游戏 3：相遇问题 ============ -->
+  <div id="game3" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g3-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g3-score">0</span></span>
+        <span class="badge hidden" id="g3-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g3-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g3-question"></p>
+      <div class="seg" id="g3-seg"></div>
+      <div class="options" id="g3-options"></div>
+      <div class="feedback" id="g3-fb"></div>
+      <button class="big-btn hidden" id="g3-next" onclick="g3Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ============ 错题本 ============ -->
+  <div id="wrongbook" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <h2 style="color:#2b6cb0;font-size:22px">📕 我的错题本（<span id="wrong-total">0</span>）</h2>
+        <button class="back-btn" onclick="showHome()">← 返回</button>
+      </div>
+      <div style="text-align:center;margin-bottom:14px">
+        <button class="small-btn" id="ans-toggle" onclick="toggleAns()">👁 显示答案</button>
+        <button class="small-btn" onclick="clearWrongAll()">🗑 一键清空</button>
+      </div>
+      <div id="wrong-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ 结算 ============ -->
+  <div id="result" class="hidden">
+    <div class="card">
+      <div class="result-stars" id="r-stars">🏆</div>
+      <div class="result-title" id="r-title"></div>
+      <div class="result-score" id="r-score"></div>
+      <div id="r-detail" style="font-size:14px;color:#888;text-align:center;margin-bottom:14px"></div>
+      <button class="big-btn" id="r-back" onclick="resultBack()">返回首页 🏠</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 通用 ================= */
+const $ = id => document.getElementById(id);
+const screens = ['home','knowledge','game1','game2','game3','wrongbook','result'];
+function showScreen(name){ screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
+function showHome(){ showScreen('home'); }
+function showKnowledge(){ showScreen('knowledge'); }
+let fromWrong=false;
+function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
+function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init][n-1](); }
+function shuffleArr(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function mkOpts(correct,pool){
+  const opts=[correct];
+  for(const p of pool){ if(opts.length>=4)break; if(p!=null&&!opts.includes(p))opts.push(p); }
+  let d=1;
+  while(opts.length<4){ const v=correct+'（'+d+'）'; if(!opts.includes(v))opts.push(v); d++; }
+  return opts.sort(()=>Math.random()-0.5);
+}
+
+/* ================= 趣味元素 ================= */
+let soundOn = true;
+function toggleSound(){ soundOn=!soundOn; $('sound-toggle').textContent = soundOn?'🔊':'🔇'; }
+function beep(kind){
+  if(!soundOn) return;
+  try{
+    const ctx = beep.ctx || (beep.ctx = new (window.AudioContext||window.webkitAudioContext)());
+    if(ctx.state==='suspended') ctx.resume();
+    const t = ctx.currentTime;
+    const seq = kind==='ok'  ? [[660,0],[880,0.11]]
+             : kind==='no'  ? [[196,0],[147,0.13]]
+             :                 [[523,0],[659,0.1],[784,0.2],[1047,0.32]];
+    seq.forEach(([f,dt])=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type = kind==='no' ? 'sawtooth' : 'sine';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0.001, t+dt);
+      g.gain.exponentialRampToValueAtTime(0.16, t+dt+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t+dt+0.24);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t+dt); o.stop(t+dt+0.28);
+    });
+  }catch(e){}
+}
+function popScore(txt){
+  const el=document.createElement('div');
+  el.className='pop-score'; el.textContent=txt;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1200);
+}
+function confetti(){
+  const ems=['🎉','⭐','✨','🎊','🌟','🎈'];
+  for(let i=0;i<26;i++){
+    const s=document.createElement('span');
+    s.className='confetti';
+    s.textContent=ems[i%ems.length];
+    s.style.left=(4+Math.random()*92)+'vw';
+    s.style.animationDelay=(Math.random()*0.9)+'s';
+    s.style.animationDuration=(2.2+Math.random()*1.6)+'s';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),5200);
+  }
+}
+function setStreak(base,n){
+  const el=$(base+'-streak');
+  if(!el) return;
+  if(n>=2){ el.textContent='🔥 连对 ×'+n; el.classList.remove('hidden'); }
+  else el.classList.add('hidden');
+}
+function markResult(correctVal,userBtns,pickedBtn,fbEl,explain){
+  userBtns.forEach(b=>b.disabled=true);
+  if(pickedBtn){
+    if(pickedBtn.dataset.ok==='1'){ pickedBtn.classList.add('correct'); }
+    else{
+      pickedBtn.classList.add('wrong');
+      userBtns.forEach(b=>{ if(b.dataset.ok==='1') b.classList.add('correct'); });
+    }
+  }
+  fbEl.innerHTML=`正确答案：${correctVal}。${explain}`;
+  fbEl.className='feedback '+(pickedBtn&&pickedBtn.dataset.ok==='1'?'ok':'no');
+}
+
+/* ================= 游戏 1：基础行程 ================= */
+let g1 = {};
+const G1_VEHICLES=['一辆汽车','一列火车','一辆客车','一辆货车','王叔叔开车'];
+function g1Init(){ g1={q:0,score:0,total:10,streak:0}; g1Ask(); }
+function g1Ask(){
+  g1.q++;
+  $('g1-q').textContent=g1.q; $('g1-score').textContent=g1.score;
+  $('g1-bar').style.width=((g1.q-1)/g1.total*100)+'%';
+  $('g1-fb').textContent=''; $('g1-fb').className='feedback'; $('g1-next').classList.add('hidden');
+  const who=G1_VEHICLES[Math.floor(Math.random()*G1_VEHICLES.length)];
+  let question, correct, pool, explain;
+  const kind=Math.random();
+  if(kind<0.3){ // 求路程
+    const v=40+5*Math.floor(Math.random()*17), t=2+Math.floor(Math.random()*9);
+    const s=v*t;
+    question=`${who}每小时行驶 ${v} 千米，行驶 ${t} 小时，一共行驶多少千米？`;
+    correct=`${s} 千米`;
+    pool=[`${v+t} 千米`,`${s+5} 千米`,`${v*t+v} 千米`];
+    explain=`速度 × 时间 = 路程：${v} × ${t} = ${s}（千米）。`;
+  } else if(kind<0.55){ // 求速度（强调复合单位）
+    const t=2+Math.floor(Math.random()*4), v=10+Math.floor(Math.random()*50);
+    const s=v*t;
+    question=`${who}${t} 小时行驶了 ${s} 千米，它的速度是多少？`;
+    correct=`${v} 千米/时`;
+    pool=[`${v} 千米`,`${s} 千米/时`,`${v+t} 千米/时`];
+    explain=`路程 ÷ 时间 = 速度：${s} ÷ ${t} = ${v}。⚠️ 速度是复合单位，必须写<b>千米/时</b>，只写"千米"是错的！`;
+  } else if(kind<0.8){ // 求时间
+    const v=40+5*Math.floor(Math.random()*17), t=2+Math.floor(Math.random()*9);
+    const s=v*t;
+    question=`${who}的速度是每小时 ${v} 千米，行驶 ${s} 千米需要多少小时？`;
+    correct=`${t} 小时`;
+    pool=[`${v+t} 小时`,`${s} 小时`,`${t+1} 小时`];
+    explain=`路程 ÷ 速度 = 时间：${s} ÷ ${v} = ${t}（小时）。`;
+  } else { // 速度单位判断
+    const scenes=[
+      {w:'一列火车', d:'每小时行驶 150 千米', ok:'150 千米/时'},
+      {w:'小明走路', d:'每分钟步行 60 米', ok:'60 米/分'},
+      {w:'猎豹奔跑', d:'每秒跑 31 米', ok:'31 米/秒'},
+      {w:'一架飞机', d:'每小时飞行 900 千米', ok:'900 千米/时'},
+    ];
+    const sc=scenes[Math.floor(Math.random()*scenes.length)];
+    const parts=sc.ok.split(' ');
+    const base=parts[0], unit=parts[1].split('/');
+    question=`${sc.w}${sc.d}，它的速度应该写作多少？`;
+    correct=sc.ok;
+    pool=[`${base} ${unit[0]}`,`${base} ${unit[1]}/${unit[0]}`,`${base} ${unit[0]==='米'?'千米':'米'}/${unit[1]}`];
+    explain=`每${unit[1]==='时'?'小时':(unit[1]==='分'?'分钟':'秒')}行 ${base}${unit[0]}，速度就写作 <b>${base} ${unit[0]}/${unit[1]}</b>。速度=路程/时间，是复合单位，斜线不能少、两边不能换位置。`;
+  }
+  g1.correct=correct; g1.explain=explain;
+  $('g1-question').textContent=question;
+  const opts=mkOpts(correct,pool);
+  $('g1-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g1Answer(this)">${o}</button>`).join('');
+}
+function g1Answer(btn){
+  const ok=btn.dataset.ok==='1';
+  markResult(g1.correct,[...$('g1-options').querySelectorAll('.opt-btn')],btn,$('g1-fb'),g1.explain);
+  if(ok){ g1.score+=10; g1.streak=(g1.streak||0)+1; setStreak('g1',g1.streak); beep('ok'); popScore('+10 ⭐'); }
+  else{ g1.streak=0; setStreak('g1',0); beep('no'); recordWrong({game:'行程', title:$('g1-question').textContent, svg:'', user:btn.textContent, correct:g1.correct, explain:g1.explain.replace(/<[^>]+>/g,'')}); }
+  $('g1-score').textContent=g1.score;
+  $('g1-next').classList.remove('hidden');
+  $('g1-next').textContent = g1.q>=g1.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g1Next(){ if(g1.q>=g1.total){ finishCommon('基础行程',g1,'行程三公式：速度×时间=路程；路程÷时间=速度；路程÷速度=时间。速度一定写复合单位：千米/时、米/分。'); } else g1Ask(); }
+
+/* ================= 游戏 2：单价总价 ================= */
+let g2 = {};
+const G2_GOODS=[['钢笔','支'],['笔记本','本'],['皮球','个'],['雨伞','把'],['水杯','个'],['跳绳','根']];
+function g2Init(){ g2={q:0,score:0,total:10,streak:0}; g2Ask(); }
+function g2Ask(){
+  g2.q++;
+  $('g2-q').textContent=g2.q; $('g2-score').textContent=g2.score;
+  $('g2-bar').style.width=((g2.q-1)/g2.total*100)+'%';
+  $('g2-fb').textContent=''; $('g2-fb').className='feedback'; $('g2-next').classList.add('hidden');
+  const [name,unit]=G2_GOODS[Math.floor(Math.random()*G2_GOODS.length)];
+  const p=4+Math.floor(Math.random()*46), c=3+Math.floor(Math.random()*10);
+  const total=p*c;
+  let question, correct, pool, explain;
+  const kind=Math.random();
+  if(kind<0.35){ // 求总价
+    question=`文具店里每${unit}${name} ${p} 元，买 ${c}${unit}要多少元？`;
+    correct=`${total} 元`;
+    pool=[`${p+c} 元`,`${total+c} 元`,`${p*(c-1)} 元`];
+    explain=`单价 × 数量 = 总价：${p} × ${c} = ${total}（元）。`;
+  } else if(kind<0.7){ // 求单价
+    question=`买 ${c}${unit}${name}一共花了 ${total} 元，每${unit}${name}多少元？`;
+    correct=`${p} 元`;
+    pool=[`${p+c} 元`,`${total} 元`,`${total+p} 元`];
+    explain=`总价 ÷ 数量 = 单价：${total} ÷ ${c} = ${p}（元）。`;
+  } else { // 求数量
+    question=`${name}每${unit} ${p} 元，${total} 元一共可以买几${unit}？`;
+    correct=`${c} ${unit}`;
+    pool=[`${c+1} ${unit}`,`${p+c} ${unit}`,`${total} ${unit}`];
+    explain=`总价 ÷ 单价 = 数量：${total} ÷ ${p} = ${c}（${unit}）。`;
+  }
+  g2.correct=correct; g2.explain=explain;
+  $('g2-question').textContent=question;
+  const opts=mkOpts(correct,pool);
+  $('g2-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g2Answer(this)">${o}</button>`).join('');
+}
+function g2Answer(btn){
+  const ok=btn.dataset.ok==='1';
+  markResult(g2.correct,[...$('g2-options').querySelectorAll('.opt-btn')],btn,$('g2-fb'),g2.explain);
+  if(ok){ g2.score+=10; g2.streak=(g2.streak||0)+1; setStreak('g2',g2.streak); beep('ok'); popScore('+10 ⭐'); }
+  else{ g2.streak=0; setStreak('g2',0); beep('no'); recordWrong({game:'单价', title:$('g2-question').textContent, svg:'', user:btn.textContent, correct:g2.correct, explain:g2.explain.replace(/<[^>]+>/g,'')}); }
+  $('g2-score').textContent=g2.score;
+  $('g2-next').classList.remove('hidden');
+  $('g2-next').textContent = g2.q>=g2.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g2Next(){ if(g2.q>=g2.total){ finishCommon('单价总价',g2,'购物三公式：单价×数量=总价；总价÷数量=单价；总价÷单价=数量。先想清楚求哪个量，再选公式。'); } else g2Ask(); }
+
+/* ================= 游戏 3：相遇问题 ================= */
+let g3 = {};
+function g3Init(){ g3={q:0,score:0,total:10,streak:0}; g3Ask(); }
+function g3Ask(){
+  g3.q++;
+  $('g3-q').textContent=g3.q; $('g3-score').textContent=g3.score;
+  $('g3-bar').style.width=((g3.q-1)/g3.total*100)+'%';
+  $('g3-fb').textContent=''; $('g3-fb').className='feedback'; $('g3-next').classList.add('hidden');
+  let question, correct, pool, explain, seg='';
+  const kind=Math.random();
+  if(kind<0.15){ // 行走方式判断
+    const scens=[
+      ['两人同时从两地出发，面对面走过去','相向而行','面对面走就是相向而行。相遇问题的前提：同时出发、两地、相向而行。'],
+      ['两人从同一地点出发，朝同一个方向走','同向而行','朝同一个方向走叫同向而行，这种情况追上对方叫追及问题，不是相遇。'],
+      ['两人从同一地点出发，背对背朝相反方向走','背向而行','背对背越走越远叫背向而行，两人永远不会相遇。'],
+    ];
+    const sc=scens[Math.floor(Math.random()*scens.length)];
+    question=`${sc[0]}，用数学语言说这叫什么？`;
+    correct=sc[1];
+    pool=['相向而行','同向而行','背向而行'].filter(x=>x!==correct);
+    explain=sc[2];
+    seg='';
+    $('g3-seg').innerHTML='';
+    $('g3-question').textContent=question;
+    const opts=shuffleArr([correct,...pool]);
+    $('g3-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g3Answer(this)">${o}</button>`).join('');
+    g3.correct=correct; g3.explain=explain;
+    return;
+  }
+  let va=30+5*Math.floor(Math.random()*15), vb=20+5*Math.floor(Math.random()*9);
+  while(vb===va) vb=20+5*Math.floor(Math.random()*9);
+  const t=2+Math.floor(Math.random()*5);
+  const S=(va+vb)*t;
+  const meetPct=(Number(va)/(Number(va)+Number(vb))*100).toFixed(1);
+  const dur=Math.max(1.4,Math.min(2.6,t*0.6)).toFixed(2);
+  seg=`<div class="seg-top"><span>🚗→ 甲车 ${va} 千米/时</span><span class="dist">两地相距 ${S} 千米</span><span>乙车 ${vb} 千米/时 ←🚙</span></div><div class="seg-track" id="g3-track" style="--meet:${meetPct}%;--split:${meetPct}%;--dur:${dur}s"><div class="seg-bar"></div><div class="car car-a">🚗</div><div class="car car-b">🚙</div><div class="meet-flash">💥</div></div><div class="seg-ends"><span>甲地</span><span>乙地</span></div><button class="replay-btn" onclick="g3Replay()">▶ 再看一遍动画</button>`;
+  if(kind<0.5){ // 求相遇时间
+    question=`甲、乙两车同时从两地相向而行，甲车每小时行 ${va} 千米，乙车每小时行 ${vb} 千米。经过多少小时两车相遇？`;
+    correct=`${t} 小时`;
+    pool=[`${va+vb} 小时`,`${t+1} 小时`,`${t+2} 小时`];
+    explain=`先求<b>速度和</b>：${va} + ${vb} = ${va+vb}（千米/时）。总路程 ÷ 速度和 = 相遇时间：${S} ÷ ${va+vb} = ${t}（小时）。也可以分开算：甲走 ${va*t} + 乙走 ${vb*t} = ${S} 千米。`;
+  } else if(kind<0.75){ // 求总路程
+    question=`甲、乙两车同时从两地相向而行，甲车每小时行 ${va} 千米，乙车每小时行 ${vb} 千米，经过 ${t} 小时两车相遇。两地相距多少千米？`;
+    correct=`${S} 千米`;
+    pool=[`${va*t} 千米`,`${vb*t} 千米`,`${va+vb+t} 千米`];
+    explain=`<b>速度和 × 相遇时间 = 总路程</b>：(${va} + ${vb}) × ${t} = ${va+vb} × ${t} = ${S}（千米）。易错：只算一辆车的路程（甲 ${va*t} 或乙 ${vb*t}）就漏了一半！`;
+  } else { // 求乙车速度
+    question=`两地相距 ${S} 千米，甲、乙两车同时从两地相向而行，经过 ${t} 小时相遇。甲车每小时行 ${va} 千米，乙车每小时行多少千米？`;
+    correct=`${vb} 千米/时`;
+    pool=[`${va+vb} 千米/时`,`${S-va} 千米/时`,`${vb+5} 千米/时`];
+    explain=`总路程 ÷ 相遇时间 = 速度和：${S} ÷ ${t} = ${va+vb}（千米/时）；再减去甲车速度：${va+vb} − ${va} = ${vb}（千米/时）。`;
+  }
+  g3.correct=correct; g3.explain=explain;
+  $('g3-question').textContent=question;
+  $('g3-seg').innerHTML=seg;
+  const tr=$('g3-track');
+  if(tr) requestAnimationFrame(()=>requestAnimationFrame(()=>tr.classList.add('run')));
+  const opts=mkOpts(correct,pool);
+  $('g3-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g3Answer(this)">${o}</button>`).join('');
+}
+function g3Replay(){
+  const tr=$('g3-track');
+  if(!tr) return;
+  tr.classList.remove('run');
+  void tr.offsetWidth;
+  tr.classList.add('run');
+}
+function g3Answer(btn){
+  const ok=btn.dataset.ok==='1';
+  markResult(g3.correct,[...$('g3-options').querySelectorAll('.opt-btn')],btn,$('g3-fb'),g3.explain);
+  if(ok){ g3.score+=10; g3.streak=(g3.streak||0)+1; setStreak('g3',g3.streak); beep('ok'); popScore('+10 ⭐'); }
+  else{ g3.streak=0; setStreak('g3',0); beep('no'); recordWrong({game:'相遇', title:$('g3-question').textContent, svg:'', user:btn.textContent, correct:g3.correct, explain:g3.explain.replace(/<[^>]+>/g,'')}); }
+  $('g3-score').textContent=g3.score;
+  $('g3-next').classList.remove('hidden');
+  $('g3-next').textContent = g3.q>=g3.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g3Next(){ if(g3.q>=g3.total){ finishCommon('相遇问题',g3,'相遇问题先画线段图：速度和×相遇时间=总路程。前提：同时出发、两地、相向而行。'); } else g3Ask(); }
+
+/* ================= 通用结算 ================= */
+function finishCommon(name,g,detail){
+  const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
+  $('r-stars').textContent='⭐'.repeat(stars)+(stars<3?'✩'.repeat(3-stars):'');
+  $('r-title').textContent = stars===3?name+' 满分通关！':(stars===2?name+' 表现不错！':name+' 再练一次就熟了～');
+  $('r-score').textContent=`得分：${g.score} / ${max}`;
+  $('r-detail').textContent=detail;
+  showScreen('result');
+}
+
+/* ================= 错题本（IndexedDB） ================= */
+function openDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open('RelationExplorerDB',1);
+    req.onupgradeneeded=e=>{ e.target.result.createObjectStore('wrong',{keyPath:'id',autoIncrement:true}); };
+    req.onsuccess=e=>res(e.target.result);
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function dbAll(){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const req=db.transaction('wrong','readonly').objectStore('wrong').getAll();
+    req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);
+  });
+}
+async function dbAdd(entry){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('wrong','readwrite');
+    tx.objectStore('wrong').add(entry);
+    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+  });
+}
+async function dbDel(id){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('wrong','readwrite');
+    tx.objectStore('wrong').delete(id);
+    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+  });
+}
+async function dbClear(){
+  const db=await openDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction('wrong','readwrite');
+    tx.objectStore('wrong').clear();
+    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+  });
+}
+function recordWrong(entry){
+  dbAdd({...entry, time:Date.now()}).then(()=>updateWrongCount()).catch(e=>console.warn('错题保存失败',e));
+}
+async function updateWrongCount(){
+  try{ const all=await dbAll(); const el=$('wrong-count'); if(el)el.textContent=all.length; }catch(e){}
+}
+function showWrongBook(){ showScreen('wrongbook'); renderWrongList(); }
+let hideAns=true;
+function toggleAns(){
+  hideAns=!hideAns;
+  $('ans-toggle').textContent = hideAns ? '👁 显示答案' : '🙈 隐藏答案';
+  applyAnsState();
+}
+function applyAnsState(){
+  const list=$('wrong-list');
+  if(list) list.classList.toggle('hide-ans',hideAns);
+}
+const GAME_NO={'行程':1,'单价':2,'相遇':3};
+function redoWrong(label){
+  const n=GAME_NO[label];
+  if(n){ startGame(n); fromWrong=true; }
+  else showHome();
+}
+async function renderWrongList(){
+  const list=$('wrong-list');
+  let all=[];
+  try{ all=(await dbAll()).sort((a,b)=>b.time-a.time); }
+  catch(e){ list.innerHTML='<p style="text-align:center;color:#999">读取失败，请刷新重试</p>'; return; }
+  $('wrong-total').textContent=all.length;
+  if(!all.length){ list.innerHTML='<p style="text-align:center;color:#999;padding:30px 0">还没有错题，太棒了！🎉</p>'; return; }
+  list.innerHTML=all.map(w=>`
+    <div class="wrong-item">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span class="badge">${w.game}</span>
+        <span style="font-size:12px;color:#aaa">${new Date(w.time).toLocaleString('zh-CN')}</span>
+      </div>
+      <p style="font-size:15px;line-height:1.7;margin:8px 0 4px;font-weight:bold">${w.title}</p>
+      <div class="ansline">
+        <p style="font-size:14px;margin:6px 0"><span style="color:#b83232">你的答案：${w.user}</span> ｜ <span style="color:#1d7a4a;font-weight:bold">正确答案：${w.correct}</span></p>
+        <p style="font-size:13px;color:#666;line-height:1.6;margin:4px 0 10px">💡 ${w.explain}</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="small-btn" onclick="delWrong(${w.id})">已掌握，删掉 ✓</button>
+        <button class="small-btn" onclick="redoWrong('${w.game}')">🔁 再次练习</button>
+      </div>
+    </div>`).join('');
+  applyAnsState();
+}
+async function delWrong(id){ await dbDel(id); renderWrongList(); updateWrongCount(); }
+async function clearWrongAll(){
+  if(!confirm('确定清空所有错题吗？清空后找不回来了。'))return;
+  await dbClear(); renderWrongList(); updateWrongCount();
+}
+updateWrongCount();
+</script>
+</body>
+</html>

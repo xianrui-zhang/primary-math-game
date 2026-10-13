@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>除法大冒险 · 北师大版四年级《除法》</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { font-family:"PingFang SC","Microsoft YaHei",sans-serif; background:linear-gradient(160deg,#ecfeff 0%,#f0f9ff 50%,#fefce8 100%); min-height:100vh; color:#333; }
+  .container { max-width:840px; margin:0 auto; padding:20px 16px 60px; }
+  h1 { text-align:center; font-size:28px; margin:18px 0 6px; color:#0369a1; }
+  .subtitle { text-align:center; color:#888; font-size:14px; margin-bottom:24px; }
+  .card { background:#fff; border-radius:20px; padding:24px; box-shadow:0 6px 24px rgba(3,105,161,.10); margin-bottom:20px; }
+  .levels { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; }
+  .level-btn { border:none; border-radius:18px; padding:20px 14px; cursor:pointer; font-size:17px; font-weight:bold; color:#fff; transition:transform .15s, box-shadow .15s; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .level-btn:hover { transform:translateY(-4px); box-shadow:0 10px 20px rgba(0,0,0,.15); }
+  .level-btn .icon { font-size:36px; }
+  .level-btn .desc { font-size:12px; font-weight:normal; opacity:.92; }
+  .l1 { background:linear-gradient(135deg,#38bdf8,#0369a1); }
+  .l2 { background:linear-gradient(135deg,#4ade80,#16a34a); }
+  .l3 { background:linear-gradient(135deg,#fb923c,#ea580c); }
+  .l4 { background:linear-gradient(135deg,#f472b6,#be185d); }
+  .l5 { background:linear-gradient(135deg,#a78bfa,#6d28d9); }
+  .l6 { background:linear-gradient(135deg,#2dd4bf,#0f766e); }
+  .l7 { background:linear-gradient(135deg,#94a3b8,#334155); }
+  .card-btn { background:linear-gradient(135deg,#0369a1,#0c4a6e); width:100%; }
+  table.kb { width:100%; border-collapse:collapse; font-size:14px; }
+  table.kb th, table.kb td { border:1px solid #dbeafe; padding:7px 8px; text-align:center; }
+  table.kb th { background:#eff6ff; color:#0369a1; }
+  .tip { margin-top:12px; background:#fff8e6; border-left:4px solid #f7b733; padding:10px 14px; border-radius:8px; font-size:14px; line-height:1.8; }
+  .hidden { display:none !important; }
+  .game-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .badge { background:#eff6ff; color:#0369a1; border-radius:12px; padding:5px 14px; font-size:14px; font-weight:bold; }
+  .progress { height:8px; background:#eef4fb; border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,#38bdf8,#4ade80); width:0%; transition:width .4s; }
+  .expr { font-size:26px; font-weight:bold; color:#0c4a6e; text-align:center; margin:14px 0; }
+  .expr small { display:block; font-size:13px; color:#9aa8bd; margin-top:4px; font-weight:normal; }
+  .shu { font-family:"SF Mono",Menlo,Consolas,monospace; font-size:20px; text-align:left; background:#f8fafc; border:1.5px solid #dbeafe; border-radius:12px; padding:12px 18px; line-height:1.5; display:inline-block; margin:10px auto; white-space:pre; }
+  .shu .bad { color:#dc2626; font-weight:bold; }
+  .shu-wrap { text-align:center; }
+  .options { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .opt-btn { border:2px solid #dbeafe; background:#f8fbff; border-radius:14px; padding:13px 22px; font-size:16px; font-weight:bold; color:#0369a1; cursor:pointer; transition:all .15s; line-height:1.5; }
+  .opt-btn:hover { border-color:#38bdf8; background:#eff8ff; transform:scale(1.03); }
+  .opt-btn.correct { background:#e6f9ee; border-color:#2fb56b; color:#1d7a4a; }
+  .opt-btn.wrong { background:#fdeaea; border-color:#e06060; color:#b83232; }
+  .feedback { text-align:center; min-height:52px; margin-top:14px; font-size:15px; line-height:1.7; }
+  .feedback.ok { color:#1d7a4a; font-weight:bold; }
+  .feedback.no { color:#b83232; font-weight:bold; }
+  .big-btn { display:block; margin:18px auto 0; border:none; border-radius:14px; background:linear-gradient(135deg,#38bdf8,#0369a1); color:#fff; font-size:17px; font-weight:bold; padding:13px 40px; cursor:pointer; box-shadow:0 4px 14px rgba(3,105,161,.35); transition:transform .15s; }
+  .big-btn:hover { transform:scale(1.05); }
+  .back-btn { background:none; border:1.5px solid #c8d6e8; color:#7a8ba3; border-radius:10px; padding:6px 16px; font-size:13px; cursor:pointer; }
+  .small-btn { border:1.5px solid #c8d6e8; background:#f8fbff; color:#0369a1; border-radius:10px; padding:8px 18px; font-size:14px; cursor:pointer; }
+  .result-stars { text-align:center; font-size:52px; margin-bottom:8px; }
+  .result-title { text-align:center; font-size:24px; font-weight:bold; color:#0369a1; margin-bottom:6px; }
+  .result-score { text-align:center; font-size:16px; color:#666; margin-bottom:16px; }
+  .wrong-item { background:#fdf6f6; border:1.5px solid #f0d6d6; border-radius:14px; padding:14px 16px; margin-bottom:14px; }
+  .ansline { transition:filter .25s; }
+  .hide-ans .ansline { filter:blur(7px); pointer-events:none; }
+  #sound-toggle { position:fixed; top:14px; right:14px; z-index:99; border:1.5px solid #c8d6e8; background:#fff; border-radius:50%; width:46px; height:46px; font-size:21px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,.10); }
+  .pop-score { position:fixed; left:50%; top:38%; transform:translateX(-50%); font-size:32px; font-weight:bold; color:#ff9a56; pointer-events:none; z-index:98; text-shadow:0 2px 10px rgba(255,154,86,.45); animation:popUp 1.1s ease-out forwards; }
+  @keyframes popUp { 0%{opacity:0;transform:translate(-50%,12px) scale(.6);} 25%{opacity:1;transform:translate(-50%,0) scale(1.18);} 100%{opacity:0;transform:translate(-50%,-52px) scale(1);} }
+  .confetti { position:fixed; top:-34px; font-size:22px; pointer-events:none; z-index:97; animation:fall linear forwards; }
+  @keyframes fall { to { transform:translateY(108vh) rotate(360deg); opacity:.65; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <button id="sound-toggle" onclick="toggleSound()" title="音效开关">🔊</button>
+  <h1>🌷 除法大冒险</h1>
+  <div class="subtitle">北师大版 · 数学四年级上册 · 第六单元《除法》 · 玩中学 · v1.0</div>
+
+  <!-- 首页 -->
+  <div id="home">
+    <div class="card">
+      <div class="levels">
+        <button class="level-btn l1" onclick="startGame(1)"><span class="icon">🧮</span>整十数除法<span class="desc">买文具：除数是整十数</span></button>
+        <button class="level-btn l2" onclick="startGame(2)"><span class="icon">🌷</span>试商填空<span class="desc">参观花圃：把除数看作整十数</span></button>
+        <button class="level-btn l3" onclick="startGame(3)"><span class="icon">🍂</span>调商专项<span class="desc">秋游：商大了调小，商小了调大</span></button>
+        <button class="level-btn l4" onclick="startGame(4)"><span class="icon">⚖️</span>商不变·余数变化<span class="desc">全册最阴的坑：余数跟着变！</span></button>
+        <button class="level-btn l5" onclick="startGame(5)"><span class="icon">✂️</span>竖式改错<span class="desc">火眼金睛：错在哪里？</span></button>
+        <button class="level-btn l6" onclick="startGame(6)"><span class="icon">🧃</span>商不变·简便除法<span class="desc">同时缩小，算得飞快</span></button>
+        <button class="level-btn l7" onclick="startGame(7)"><span class="icon">🧙</span>除法大法官<span class="desc">这些说法成立吗？</span></button>
+      </div>
+      <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">试商四步法 + 商不变规律 + 调商口诀</span></button>
+      <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
+    </div>
+  </div>
+
+  <!-- 秘籍卡 -->
+  <div id="knowledge" class="hidden">
+    <div class="card">
+      <h2 style="text-align:center;color:#0369a1;margin-bottom:14px">📖 除法秘籍卡</h2>
+      <table class="kb">
+        <tr><th>试商四步</th><th>怎么做</th></tr>
+        <tr><td>① 看作整十</td><td>把除数 21 看作 20、68 看作 70 来试商</td></tr>
+        <tr><td>② 试商</td><td>用整十数去估：商最大能是几</td></tr>
+        <tr><td>③ 调商</td><td>商大了 → <b>调小</b>；商小了（余数≥除数）→ <b>调大</b></td></tr>
+        <tr><td>④ 检验</td><td>商×除数（+余数）= 被除数</td></tr>
+      </table>
+      <div class="tip">
+        ⚖️ <b>商不变的规律：</b>被除数和除数<b>同时乘或除以相同的数（0 除外）</b>，商不变。<br>
+        ⚠️ <b>全册最阴的坑：</b>商不变时，<b>余数也跟着变</b>！410÷60 = 41÷6 = 6 余 5，但真正的余数是 <b>5×10=50</b>，不是 5！<br>
+        🍂 <b>调商口诀：</b>试商商大了（乘积超过被除数）→ 调小；余数≥除数 → 商小了，调大。<br>
+        🔍 <b>验算：</b>商×除数+余数 = 被除数。
+      </div>
+      <button class="big-btn" onclick="showHome()">我知道啦，去闯关！🚀</button>
+    </div>
+  </div>
+
+  <!-- 游戏1 整十数除法 -->
+  <div id="game1" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g1-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g1-score">0</span></span>
+        <span class="badge hidden" id="g1-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g1-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g1-question"></p>
+      <div class="shu-wrap"><span class="shu" id="g1-expr"></span></div>
+      <div class="options" id="g1-options"></div>
+      <div class="feedback" id="g1-fb"></div>
+      <button class="big-btn hidden" id="g1-next" onclick="g1Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 游戏2 试商填空 -->
+  <div id="game2" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g2-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g2-score">0</span></span>
+        <span class="badge hidden" id="g2-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g2-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g2-question"></p>
+      <div class="expr" id="g2-expr"></div>
+      <div class="options" id="g2-options"></div>
+      <div class="feedback" id="g2-fb"></div>
+      <button class="big-btn hidden" id="g2-next" onclick="g2Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 游戏3 调商 -->
+  <div id="game3" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g3-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g3-score">0</span></span>
+        <span class="badge hidden" id="g3-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g3-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g3-question"></p>
+      <div class="expr" id="g3-expr"></div>
+      <div class="options" id="g3-options"></div>
+      <div class="feedback" id="g3-fb"></div>
+      <button class="big-btn hidden" id="g3-next" onclick="g3Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 游戏4 商不变余数变化 -->
+  <div id="game4" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g4-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g4-score">0</span></span>
+        <span class="badge hidden" id="g4-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g4-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g4-question"></p>
+      <div class="expr" id="g4-expr"></div>
+      <div class="options" id="g4-options"></div>
+      <div class="feedback" id="g4-fb"></div>
+      <button class="big-btn hidden" id="g4-next" onclick="g4Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 游戏5 竖式改错 -->
+  <div id="game5" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g5-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g5-score">0</span></span>
+        <span class="badge hidden" id="g5-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g5-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px">这道竖式错在哪里？</p>
+      <div class="shu-wrap"><span class="shu" id="g5-expr"></span></div>
+      <div class="options" id="g5-options"></div>
+      <div class="feedback" id="g5-fb"></div>
+      <button class="big-btn hidden" id="g5-next" onclick="g5Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 游戏6 商不变简便 -->
+  <div id="game6" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g6-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g6-score">0</span></span>
+        <span class="badge hidden" id="g6-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g6-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px">用商不变的规律，结果是多少？</p>
+      <div class="expr" id="g6-expr"></div>
+      <div class="options" id="g6-options"></div>
+      <div class="feedback" id="g6-fb"></div>
+      <button class="big-btn hidden" id="g6-next" onclick="g6Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 游戏7 大法官 -->
+  <div id="game7" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g7-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g7-score">0</span></span>
+        <span class="badge hidden" id="g7-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g7-bar"></div></div>
+      <div style="background:#f8fbff;border-radius:14px;padding:22px 18px;margin:6px 0 18px">
+        <p style="font-size:19px;line-height:1.8;text-align:center;font-weight:bold" id="g7-text"></p>
+      </div>
+      <div class="options">
+        <button class="opt-btn" id="g7-true" onclick="g7Answer(true,this)" style="font-size:22px;padding:16px 44px">✓ 对</button>
+        <button class="opt-btn" id="g7-false" onclick="g7Answer(false,this)" style="font-size:22px;padding:16px 44px">✗ 错</button>
+      </div>
+      <div class="feedback" id="g7-fb"></div>
+      <button class="big-btn hidden" id="g7-next" onclick="g7Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 错题本 -->
+  <div id="wrongbook" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <h2 style="color:#0369a1;font-size:22px">📕 我的错题本（<span id="wrong-total">0</span>）</h2>
+        <button class="back-btn" onclick="showHome()">← 返回</button>
+      </div>
+      <div style="text-align:center;margin-bottom:14px">
+        <button class="small-btn" id="ans-toggle" onclick="toggleAns()">👁 显示答案</button>
+        <button class="small-btn" onclick="clearWrongAll()">🗑 一键清空</button>
+      </div>
+      <div id="wrong-list"></div>
+    </div>
+  </div>
+
+  <!-- 结算 -->
+  <div id="result" class="hidden">
+    <div class="card">
+      <div class="result-stars" id="r-stars">🏆</div>
+      <div class="result-title" id="r-title"></div>
+      <div class="result-score" id="r-score"></div>
+      <div id="r-detail" style="font-size:14px;color:#888;text-align:center;margin-bottom:14px"></div>
+      <button class="big-btn" id="r-back" onclick="resultBack()">返回首页 🏠</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 通用 ================= */
+const $ = id => document.getElementById(id);
+const screens = ['home','knowledge','game1','game2','game3','game4','game5','game6','game7','wrongbook','result'];
+function showScreen(name){ screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
+function showHome(){ showScreen('home'); }
+function showKnowledge(){ showScreen('knowledge'); }
+let fromWrong=false;
+function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
+function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init,g5Init,g6Init,g7Init][n-1](); }
+
+/* ================= 趣味元素 ================= */
+let soundOn = true;
+function toggleSound(){ soundOn=!soundOn; $('sound-toggle').textContent = soundOn?'🔊':'🔇'; }
+function beep(kind){
+  if(!soundOn) return;
+  try{
+    const ctx = beep.ctx || (beep.ctx = new (window.AudioContext||window.webkitAudioContext)());
+    if(ctx.state==='suspended') ctx.resume();
+    const t = ctx.currentTime;
+    const seq = kind==='ok'  ? [[660,0],[880,0.11]]
+             : kind==='no'  ? [[196,0],[147,0.13]]
+             :                 [[523,0],[659,0.1],[784,0.2],[1047,0.32]];
+    seq.forEach(([f,dt])=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type = kind==='no' ? 'sawtooth' : 'sine';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0.001, t+dt);
+      g.gain.exponentialRampToValueAtTime(0.16, t+dt+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t+dt+0.24);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t+dt); o.stop(t+dt+0.28);
+    });
+  }catch(e){}
+}
+function popScore(txt){
+  const el=document.createElement('div'); el.className='pop-score'; el.textContent=txt;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1200);
+}
+function confetti(){
+  const ems=['🎉','⭐','✨','🎊','🌟','🎈'];
+  for(let i=0;i<26;i++){
+    const s=document.createElement('span'); s.className='confetti'; s.textContent=ems[i%ems.length];
+    s.style.left=(4+Math.random()*92)+'vw';
+    s.style.animationDelay=(Math.random()*0.9)+'s';
+    s.style.animationDuration=(2.2+Math.random()*1.6)+'s';
+    document.body.appendChild(s); setTimeout(()=>s.remove(),5200);
+  }
+}
+function setStreak(base,n){
+  const el=$(base+'-streak'); if(!el) return;
+  if(n>=2){ el.textContent='🔥 连对 ×'+n; el.classList.remove('hidden'); } else el.classList.add('hidden');
+}
+function shuffleArr(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function mkNumOpts(ans,pool){
+  const opts=[ans];
+  for(const p of pool){ if(opts.length>=4)break; if(Number.isInteger(p)&&p>0&&!opts.includes(p))opts.push(p); }
+  let d=1;
+  while(opts.length<4){ const v=ans+d; if(!opts.includes(v))opts.push(v); d++; }
+  return shuffleArr(opts);
+}
+function mkOpts(correct,pool){
+  const opts=[correct];
+  const isNum=/^-?\d+$/.test(String(correct));
+  for(const p of pool){ if(opts.length>=4)break; if(!opts.includes(p))opts.push(p); }
+  let d=1;
+  while(opts.length<4){ const v=isNum?Number(correct)+d:correct+'（'+d+'）'; if(!opts.includes(v))opts.push(v); d++; }
+  return shuffleArr(opts);
+}
+function renderOpts(elId,opts,answer,handler){
+  $(elId).innerHTML=opts.map(o=>`<button class="opt-btn" data-v="${o}" onclick="${handler}('${o}',this)">${o}</button>`).join('');
+}
+function markAll(listId,btn,ok,correct){
+  const allBtns=$(listId).querySelectorAll('.opt-btn');
+  allBtns.forEach(b=>b.disabled=true);
+  if(ok) btn.classList.add('correct');
+  else{ btn.classList.add('wrong'); allBtns.forEach(b=>{ if(String(b.dataset.v)===String(correct)) b.classList.add('correct'); }); }
+}
+/* 竖式渲染 */
+function buildShu(q,d,a,pd,r,highlight){
+  const w=String(a).length+3;
+  const pad=s=>{ s=String(s); return ' '.repeat(Math.max(0,w-s.length))+s; };
+  const hl=x=>highlight?`<span class="bad">${x}</span>`:x;
+  const ind=' '.repeat(w+1);
+  return [
+    ind+pad(q),
+    pad(d)+' ┌'+'─'.repeat(w),
+    ind+'│ '+pad(a),
+    ind+'│ '+hl(pad(pd)),
+    ind+'│ ─'+'─'.repeat(w-1),
+    ind+'│ '+hl(pad(r))
+  ].join('\n');
+}
+
+/* ================= 游戏1 整十数除法 ================= */
+let g1 = {};
+function g1Init(){ g1={q:0,score:0,total:10,streak:0}; g1Ask(); }
+function g1Ask(){
+  g1.q++;
+  $('g1-q').textContent=g1.q; $('g1-score').textContent=g1.score;
+  $('g1-bar').style.width=((g1.q-1)/g1.total*100)+'%';
+  $('g1-fb').textContent=''; $('g1-fb').className='feedback'; $('g1-next').classList.add('hidden');
+  const d=(1+Math.floor(Math.random()*9))*10;
+  const q=2+Math.floor(Math.random()*8);
+  const hasR=Math.random()<0.5;
+  const r=hasR?1+Math.floor(Math.random()*(d-10)):0;
+  const a=d*q+r;
+  g1.correct=hasR?`${q} 余 ${r}`:String(q);
+  const question=hasR?`${a} ÷ ${d} = 商几余几？`:`${a} ÷ ${d} = ?`;
+  $('g1-question').textContent=question;
+  $('g1-expr').innerHTML=buildShu(q,d,a,d*q,r,'');
+  let pool;
+  if(hasR) pool=[`${q+1} 余 ${r}`,`${q} 余 ${r+10}`,`${q+1} 余 ${Math.max(r-10,1)}`];
+  else pool=[String(q+1),String(q-1),String(q*10)];
+  const opts=hasR?mkOpts(g1.correct,pool):mkNumOpts(q,pool.filter(x=>x>0));
+  renderOpts('g1-options',opts,String(g1.correct),'g1Answer');
+  g1.explain=`除数是整十数：想 ${d}×${q}=${d*q}，${hasR?`${a}−${d*q}=${r}，余数 ${r} < 除数 ${d}，所以商 ${q} 余 ${r}。`:`正好商 ${q}。`}口诀：先看被除数前两位，够除就商在这里。`;
+}
+function g1Answer(val,btn){
+  const ok=String(val)===String(g1.correct);
+  markAll('g1-options',btn,ok,g1.correct);
+  if(ok){ g1.score+=10; g1.streak=(g1.streak||0)+1; setStreak('g1',g1.streak); beep('ok'); popScore('+10 ⭐'); $('g1-fb').className='feedback ok'; }
+  else{ g1.streak=0; setStreak('g1',0); beep('no'); $('g1-fb').className='feedback no';
+    recordWrong({game:'整十数除法', title:$('g1-expr').textContent, svg:'', user:val, correct:g1.correct, explain:g1.explain.replace(/<[^>]+>/g,'')});
+  }
+  $('g1-fb').innerHTML=`正确答案：${g1.correct}。${g1.explain}`;
+  $('g1-score').textContent=g1.score;
+  $('g1-next').classList.remove('hidden');
+  $('g1-next').textContent = g1.q>=g1.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g1Next(){ if(g1.q>=g1.total){ finishCommon('整十数除法',g1,'除数是整十数：先看被除数前两位，想乘法口诀定商。'); } else g1Ask(); }
+
+/* ================= 游戏2 试商填空 ================= */
+let g2 = {};
+function g2Init(){ g2={q:0,score:0,total:10,streak:0}; g2Ask(); }
+function g2Ask(){
+  g2.q++;
+  $('g2-q').textContent=g2.q; $('g2-score').textContent=g2.score;
+  $('g2-bar').style.width=((g2.q-1)/g2.total*100)+'%';
+  $('g2-fb').textContent=''; $('g2-fb').className='feedback'; $('g2-next').classList.add('hidden');
+  let d=11+Math.floor(Math.random()*89);
+  if(d%10===0) d+=1;
+  const q=2+Math.floor(Math.random()*8);
+  const a=d*q;
+  const look=Math.round(d/10)*10;
+  g2.look=look;
+  const t=Math.random();
+  let question, answer, pool, explain;
+  if(t<0.45){
+    question=`计算 ${a} ÷ ${d}，试商时把除数 ${d} 看作多少来试？`;
+    answer=String(look);
+    pool=[String(Math.floor(d/10)*10),String(look+10),String(d)];
+    explain=`四舍五入到整十数：${d} ≈ ${look}（${d} 的个位是 ${d%10}，${d%10<5?'舍去':'进一'}）。用 ${look} 试商更好算。`;
+  }else{
+    question=`${a} ÷ ${d} = ?（商是几？）`;
+    answer=String(q);
+    pool=[String(q+1),String(q-1),String(q+2)];
+    explain=`把 ${d} 看作 ${look} 试商：${a}÷${look} 大约商 ${q}，用 ${q} 一试：${d}×${q}=${a}，正好！商是 ${q}。`;
+  }
+  g2.correct=answer; g2.explain=explain;
+  $('g2-question').textContent=question;
+  $('g2-expr').textContent=`${a} ÷ ${d}`;
+  const opts=mkOpts(answer,pool);
+  renderOpts('g2-options',opts,String(answer),'g2Answer');
+}
+function g2Answer(val,btn){
+  const ok=String(val)===String(g2.correct);
+  markAll('g2-options',btn,ok,g2.correct);
+  if(ok){ g2.score+=10; g2.streak=(g2.streak||0)+1; setStreak('g2',g2.streak); beep('ok'); popScore('+10 ⭐'); $('g2-fb').className='feedback ok'; }
+  else{ g2.streak=0; setStreak('g2',0); beep('no'); $('g2-fb').className='feedback no';
+    recordWrong({game:'试商填空', title:$('g2-question').textContent+' '+$('g2-expr').textContent, svg:'', user:val, correct:g2.correct, explain:g2.explain.replace(/<[^>]+>/g,'')});
+  }
+  $('g2-fb').innerHTML=`正确答案：${g2.correct}。${g2.explain}`;
+  $('g2-score').textContent=g2.score;
+  $('g2-next').classList.remove('hidden');
+  $('g2-next').textContent = g2.q>=g2.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g2Next(){ if(g2.q>=g2.total){ finishCommon('试商填空',g2,'试商第一步：把除数四舍五入看作整十数。'); } else g2Ask(); }
+
+/* ================= 游戏3 调商 ================= */
+let g3 = {};
+function g3Init(){ g3={q:0,score:0,total:10,streak:0}; g3Ask(); }
+function g3Ask(){
+  g3.q++;
+  $('g3-q').textContent=g3.q; $('g3-score').textContent=g3.score;
+  $('g3-bar').style.width=((g3.q-1)/g3.total*100)+'%';
+  $('g3-fb').textContent=''; $('g3-fb').className='feedback'; $('g3-next').classList.add('hidden');
+  let d, q, r, look, q0, kind;
+  let tries=0;
+  do{
+    d=13+Math.floor(Math.random()*77);
+    if(d%10===0) d+=1;
+    q=2+Math.floor(Math.random()*8);
+    r=Math.floor(Math.random()*d);
+    const a=d*q+r;
+    look=Math.round(d/10)*10;
+    q0=Math.floor(a/look);
+    if(q0>q && q0<=9) kind='big';
+    else if(q0<q && q0>=1) kind='small';
+    else kind='none';
+    tries++;
+  }while(kind==='none'&&tries<40);
+  if(kind==='none'){ kind='small'; q0=q-1; }
+  const a=d*q+r;
+  g3.a=a; g3.d=d; g3.q0=q0; g3.q=q; g3.r=r;
+  let question, answer, pool, explain;
+  if(kind==='big'){
+    question=`计算 ${a} ÷ ${d}：把 ${d} 看作 ${look}，试商 ${q0}。可是 ${q0}×${d}=${q0*d}，比被除数 ${a} 还大！该怎么办？`;
+    answer=`商大了，调成 ${q}`;
+    pool=[`商小了，调成 ${q}`,`刚好，不用调`,`商再调大成 ${q+1}`];
+    explain=`试商 ${q0} 太大了：${q0}×${d}=${q0*d} ＞ ${a}，不够减。把商调小成 ${q}：${q}×${d}=${q*d}，${a}−${q*d}=${r}，余数 ${r}＜${d} ✓。所以商是 ${q}。`;
+  }else{
+    question=`计算 ${a} ÷ ${d}：把 ${d} 看作 ${look}，试商 ${q0}。试商后发现余数 ${a-q0*d} 比/等于除数 ${d}！该怎么办？`;
+    answer=`商小了，调成 ${q}`;
+    pool=[`商大了，调成 ${q}`,`刚好，不用调`,`商再调小成 ${q-1}`];
+    explain=`余数 ${a-q0*d} ≥ 除数 ${d}，说明商小了（还能再分一轮）。把商调大成 ${q}：${q}×${d}=${q*d}，${a}−${q*d}=${r}，余数 ${r}＜${d} ✓。所以商是 ${q}。`;
+  }
+  g3.correct=answer; g3.explain=explain;
+  $('g3-question').textContent=question;
+  $('g3-expr').textContent=`${a} ÷ ${d} = ?`;
+  const opts=mkOpts(answer,pool);
+  renderOpts('g3-options',opts,String(answer),'g3Answer');
+}
+function g3Answer(val,btn){
+  const ok=String(val)===String(g3.correct);
+  markAll('g3-options',btn,ok,g3.correct);
+  if(ok){ g3.score+=10; g3.streak=(g3.streak||0)+1; setStreak('g3',g3.streak); beep('ok'); popScore('+10 ⭐'); $('g3-fb').className='feedback ok'; }
+  else{ g3.streak=0; setStreak('g3',0); beep('no'); $('g3-fb').className='feedback no';
+    recordWrong({game:'调商', title:`${g3.a} ÷ ${g3.d}（试商 ${g3.q0}）`, svg:'', user:val, correct:g3.correct, explain:g3.explain.replace(/<[^>]+>/g,'')});
+  }
+  $('g3-fb').innerHTML=`正确答案：${g3.correct}。${g3.explain}`;
+  $('g3-score').textContent=g3.score;
+  $('g3-next').classList.remove('hidden');
+  $('g3-next').textContent = g3.q>=g3.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g3Next(){ if(g3.q>=g3.total){ finishCommon('调商专项',g3,'调商口诀：乘积比被除数大 → 商大了调小；余数≥除数 → 商小了调大。'); } else g3Ask(); }
+
+/* ================= 游戏4 商不变·余数变化 ================= */
+let g4 = {};
+function g4Init(){ g4={q:0,score:0,total:10,streak:0}; g4Ask(); }
+function g4Ask(){
+  g4.q++;
+  $('g4-q').textContent=g4.q; $('g4-score').textContent=g4.score;
+  $('g4-bar').style.width=((g4.q-1)/g4.total*100)+'%';
+  $('g4-fb').textContent=''; $('g4-fb').className='feedback'; $('g4-next').classList.add('hidden');
+  const B=3+Math.floor(Math.random()*7); // 3~9
+  const q=2+Math.floor(Math.random()*7);
+  const r=1+Math.floor(Math.random()*(B-1));
+  const k=(Math.random()<0.7?10:100);
+  const a=(B*q+r)*k, d=B*k;
+  g4.a=a; g4.d=d; g4.q=q; g4.r=r; g4.k=k;
+  $('g4-question').textContent=`这个有余数的除法，商和余数各是多少？（小心陷阱！）`;
+  $('g4-expr').textContent=`${a} ÷ ${d} = ?`;
+  const correct=`${q} 余 ${r*k}`;
+  g4.correct=correct;
+  const pool=[`${q} 余 ${r}`,`${q+1} 余 ${r*k}`,`${q} 余 0`];
+  const opts=mkOpts(correct,pool);
+  renderOpts('g4-options',opts,String(correct),'g4Answer');
+}
+function g4Answer(val,btn){
+  const ok=String(val)===String(g4.correct);
+  markAll('g4-options',btn,ok,g4.correct);
+  const trick=`${g4.a}÷${g4.d}：同时缩小 ${g4.k} 倍变成 ${g4.a/g4.k}÷${g4.d/g4.k}=${g4.q} 余 ${g4.r}。商不变，但<b>余数也要乘回 ${g4.k}</b>：${g4.r}×${g4.k}=${g4.r*g4.k}。`;
+  if(ok){ g4.score+=10; g4.streak=(g4.streak||0)+1; setStreak('g4',g4.streak); beep('ok'); popScore('+10 ⭐'); $('g4-fb').className='feedback ok'; }
+  else{ g4.streak=0; setStreak('g4',0); beep('no'); $('g4-fb').className='feedback no';
+    recordWrong({game:'商不变余数', title:`${g4.a} ÷ ${g4.d} 的商和余数`, svg:'', user:val, correct:g4.correct, explain:trick.replace(/<[^>]+>/g,'')});
+  }
+  $('g4-fb').innerHTML=`正确答案：${g4.correct}。${trick}`;
+  $('g4-score').textContent=g4.score;
+  $('g4-next').classList.remove('hidden');
+  $('g4-next').textContent = g4.q>=g4.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g4Next(){ if(g4.q>=g4.total){ finishCommon('商不变·余数变化',g4,'商不变的规律：商不变，但余数也跟着乘（或除以）了同一个数！'); } else g4Ask(); }
+
+/* ================= 游戏5 竖式改错 ================= */
+let g5 = {};
+function g5Init(){ g5={q:0,score:0,total:10,streak:0}; g5Ask(); }
+function g5Ask(){
+  g5.q++;
+  $('g5-q').textContent=g5.q; $('g5-score').textContent=g5.score;
+  $('g5-bar').style.width=((g5.q-1)/g5.total*100)+'%';
+  $('g5-fb').textContent=''; $('g5-fb').className='feedback'; $('g5-next').classList.add('hidden');
+  let d=12+Math.floor(Math.random()*78);
+  if(d%10===0) d+=1;
+  const q=2+Math.floor(Math.random()*8);
+  const r=1+Math.floor(Math.random()*(d-1));
+  const a=d*q+r;
+  g5.a=a; g5.d=d; g5.q=q; g5.r=r;
+  const errType=Math.floor(Math.random()*3);
+  let shownQ, shownPd, shownR, question, correct, pool, explain;
+  if(errType===0){ // 余数≥除数（商小了）
+    shownQ=q-1; shownPd=d*shownQ; shownR=a-shownPd;
+    question=`竖式里商 ${shownQ}，余数 ${shownR}。错在哪里？`;
+    correct=`余数 ${shownR} 比除数 ${d} 大，商小了，应该调大成 ${q}`;
+    pool=[`商大了要调小成 ${q-1}`,`商的位置写错了`,`没有错误，竖式是对的`];
+    explain=`余数 ${shownR} ≥ 除数 ${d}，说明还能再分一轮！商调大成 ${q}：${q}×${d}=${d*q}，余 ${r}。`;
+  }else if(errType===1){ // 商大了
+    shownQ=q+1; shownPd=d*shownQ; shownR=a-shownPd;
+    question=`竖式里商 ${shownQ}，可是 ${d}×${shownQ}=${shownPd} 比被除数 ${a} 还大。错在哪里？`;
+    correct=`试商大了，乘积超过被除数，应该调小成 ${q}`;
+    pool=[`商小了要调大成 ${q+1}`,`余数算错了`,`没有错误，竖式是对的`];
+    explain=`${d}×${shownQ}=${shownPd} ＞ ${a}，不够减！试商大了，调小成 ${q}：${q}×${d}=${d*q}，余 ${r}。`;
+  }else{ // 余数算错
+    shownQ=q; shownPd=d*q; shownR=a-shownPd;
+    const wrongR=shownR+1+Math.floor(Math.random()*Math.max(2,d-shownR-2));
+    shownR=wrongR;
+    question=`竖式里商 ${shownQ}、余数 ${shownR}。错在哪里？`;
+    correct=`余数算错了，应该是 ${a-shownPd}`;
+    pool=[`商大了要调小`,`余数算错了，应该是 ${a-shownPd+10}`,`没有错误，竖式是对的`];
+    explain=`检验：${d}×${shownQ}=${shownPd}，被除数 ${a} − ${shownPd} = ${a-shownPd}，余数应该是 <b>${a-shownPd}</b>，不是 ${shownR}。验算能抓出算错的余数！`;
+  }
+  g5.correct=correct; g5.explain=explain;
+  $('g5-expr').innerHTML=buildShu(shownQ,d,a,shownPd,shownR,true);
+  const opts=mkOpts(correct,pool);
+  renderOpts('g5-options',opts,String(correct),'g5Answer');
+}
+function g5Answer(val,btn){
+  const ok=String(val)===String(g5.correct);
+  markAll('g5-options',btn,ok,g5.correct);
+  if(ok){ g5.score+=10; g5.streak=(g5.streak||0)+1; setStreak('g5',g5.streak); beep('ok'); popScore('+10 ⭐'); $('g5-fb').className='feedback ok'; }
+  else{ g5.streak=0; setStreak('g5',0); beep('no'); $('g5-fb').className='feedback no';
+    recordWrong({game:'竖式改错', title:`${g5.a} ÷ ${g5.d} 的竖式改错`, svg:'', user:val, correct:g5.correct, explain:g5.explain.replace(/<[^>]+>/g,'')});
+  }
+  $('g5-fb').innerHTML=`正确答案：${g5.correct}。${g5.explain}`;
+  $('g5-score').textContent=g5.score;
+  $('g5-next').classList.remove('hidden');
+  $('g5-next').textContent = g5.q>=g5.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g5Next(){ if(g5.q>=g5.total){ finishCommon('竖式改错',g5,'改错三查：①余数≥除数？②乘积超过被除数？③余数=被除数−商×除数 算对了吗？'); } else g5Ask(); }
+
+/* ================= 游戏6 商不变简便 ================= */
+let g6 = {};
+function g6Init(){ g6={q:0,score:0,total:10,streak:0}; g6Ask(); }
+function g6Ask(){
+  g6.q++;
+  $('g6-q').textContent=g6.q; $('g6-score').textContent=g6.score;
+  $('g6-bar').style.width=((g6.q-1)/g6.total*100)+'%';
+  $('g6-fb').textContent=''; $('g6-fb').className='feedback'; $('g6-next').classList.add('hidden');
+  const B=2+Math.floor(Math.random()*8);
+  const C=2+Math.floor(Math.random()*9);
+  const A=B*C;
+  const k=(Math.random()<0.5?10:100);
+  const a=A*k, d=B*k;
+  g6.correct=C;
+  $('g6-expr').textContent=`${a} ÷ ${d} = ?`;
+  const opts=mkNumOpts(C,[C+1,C-1,C*2,Math.max(C-2,1),C+3,C-3]);
+  renderOpts('g6-options',opts,String(C),'g6Answer');
+  g6.explain=`被除数和除数<b>同时除以 ${k}</b>（商不变的规律）：${a}÷${k}=${A}，${d}÷${k}=${d/k}，变成 ${A}÷${d/k}=${C}。商不变！`;
+}
+function g6Answer(val,btn){
+  const ok=String(val)===String(g6.correct);
+  markAll('g6-options',btn,ok,g6.correct);
+  if(ok){ g6.score+=10; g6.streak=(g6.streak||0)+1; setStreak('g6',g6.streak); beep('ok'); popScore('+10 ⭐'); $('g6-fb').className='feedback ok'; }
+  else{ g6.streak=0; setStreak('g6',0); beep('no'); $('g6-fb').className='feedback no';
+    recordWrong({game:'商不变简便', title:$('g6-expr').textContent, svg:'', user:val, correct:g6.correct, explain:g6.explain.replace(/<[^>]+>/g,'')});
+  }
+  $('g6-fb').innerHTML=`正确答案：${g6.correct}。${g6.explain}`;
+  $('g6-score').textContent=g6.score;
+  $('g6-next').classList.remove('hidden');
+  $('g6-next').textContent = g6.q>=g6.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g6Next(){ if(g6.q>=g6.total){ finishCommon('商不变·简便除法',g6,'被除数和除数同时缩小相同倍数（0除外），商不变——大数除法变小数除法！'); } else g6Ask(); }
+
+/* ================= 游戏7 大法官 ================= */
+let g7 = {};
+const G7_POOL=[
+  {t:'试商时把除数看大了，初商容易偏小。',a:true,e:'比如 342÷57 把 57 看作 60，估出的商容易小，要调大。'},
+  {t:'有余数的除法里，余数一定比除数小。',a:true,e:'余数≥除数说明还能再分，商小了要调大。'},
+  {t:'410÷60 = 6 余 5。',a:false,e:'商不变时余数也跟着变！41÷6=6余5，但 410÷60 的余数是 5×10=50。'},
+  {t:'被除数和除数同时加上 10，商不变。',a:false,e:'商不变的规律是同时<b>乘或除以</b>相同的数，不是加！'},
+  {t:'0 不能作除数。',a:true,e:'0 作除数没有意义。'},
+  {t:'验算有余数的除法：商×除数+余数 = 被除数。',a:true,e:'这是检验除法竖式对不对的万能方法。'},
+  {t:'试商后发现商大了，应该把商调大。',a:false,e:'反了！商大了要<b>调小</b>，商小了才调大。'},
+  {t:'3500÷500 = 35÷5 = 7',a:true,e:'同时缩小 100 倍，商不变。'},
+  {t:'三位数除以两位数，商最多是两位数。',a:true,e:'最高位不够除看前两位，商最多两位。'},
+  {t:'商不变的规律里，同时乘或除以的这个数可以是 0。',a:false,e:'0 除外！除以 0 没有意义。'},
+  {t:'调商口诀：商大了要调小，商小了要调大。',a:true,e:'调商就是往"正好"的方向微调。'},
+  {t:'7200÷800 = 9',a:true,e:'同时缩小 100 倍：72÷8=9。'},
+  {t:'商不变时，余数也不会变。',a:false,e:'最大的坑！余数和被除数、除数一起变：410÷60 的余数是 50 不是 5。'},
+  {t:'计算 612÷68，把 68 看作 70 试商，初商 8，发现 612−8×68=68，余数等于除数，说明商小了。',a:true,e:'余数=除数，还能再分一轮，调成 9。'}
+];
+function g7Init(){ g7={q:0,score:0,total:10,streak:0,questions:shuffleArr(G7_POOL.slice()).slice(0,10)}; g7Ask(); }
+function g7Ask(){
+  g7.q++;
+  $('g7-q').textContent=g7.q; $('g7-score').textContent=g7.score;
+  $('g7-bar').style.width=((g7.q-1)/g7.total*100)+'%';
+  $('g7-fb').textContent=''; $('g7-fb').className='feedback'; $('g7-next').classList.add('hidden');
+  const item=g7.questions[g7.q-1];
+  g7.current=item;
+  $('g7-text').textContent=item.t;
+  ['g7-true','g7-false'].forEach(id=>{ const b=$(id); b.disabled=false; b.classList.remove('correct','wrong'); });
+}
+function g7Answer(val,btn){
+  const item=g7.current;
+  const bt=$('g7-true'), bf=$('g7-false');
+  bt.disabled=true; bf.disabled=true;
+  if(val===item.a){
+    btn.classList.add('correct'); g7.score+=10; g7.streak=(g7.streak||0)+1; setStreak('g7',g7.streak); beep('ok'); popScore('+10 ⭐');
+    $('g7-fb').innerHTML=`🎉 判断正确！${item.e}`; $('g7-fb').className='feedback ok';
+  }else{
+    g7.streak=0; setStreak('g7',0); beep('no');
+    btn.classList.add('wrong');
+    (item.a?bt:bf).classList.add('correct');
+    $('g7-fb').innerHTML=`这个说法<b>${item.a?'是对的':'是错的'}</b>。${item.e}`; $('g7-fb').className='feedback no';
+    recordWrong({game:'大法官', title:item.t, svg:'', user:val?'答了"对"':'答了"错"', correct:item.a?'对':'错', explain:item.e});
+  }
+  $('g7-score').textContent=g7.score;
+  $('g7-next').classList.remove('hidden');
+  $('g7-next').textContent = g7.q>=g7.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g7Next(){ if(g7.q>=g7.total){ finishCommon('除法大法官',g7,'最阴的坑：商不变时，余数也跟着乘或除以了同一个数！'); } else g7Ask(); }
+
+/* ================= 通用结算 ================= */
+function finishCommon(name,g,detail){
+  const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
+  $('r-stars').textContent='⭐'.repeat(stars)+(stars<3?'✩'.repeat(3-stars):'');
+  $('r-title').textContent = stars===3?name+' 满分通关！':(stars===2?name+' 表现不错！':name+' 再练一次就熟了～');
+  $('r-score').textContent=`得分：${g.score} / ${max}`;
+  $('r-detail').textContent=detail;
+  showScreen('result');
+}
+
+/* ================= 错题本存储（IndexedDB 优先，localStorage 兜底） ================= */
+const LS_KEY='DivisionExplorerWrong';
+function lsAll(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
+function lsSave(arr){ try{ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }catch(e){} }
+let idbPromise=null;
+function getIdb(){
+  if(idbPromise!==null) return idbPromise;
+  idbPromise=new Promise((res,rej)=>{
+    try{
+      if(!window.indexedDB){ rej(new Error('环境不支持 IndexedDB')); return; }
+      const req=indexedDB.open('DivisionExplorerDB',1);
+      req.onupgradeneeded=e=>{ e.target.result.createObjectStore('wrong',{keyPath:'id',autoIncrement:true}); };
+      req.onsuccess=e=>res(e.target.result);
+      req.onerror=()=>rej(req.error||new Error('IndexedDB 打开失败'));
+      req.onblocked=()=>rej(new Error('IndexedDB 被占用'));
+    }catch(e){ rej(e); }
+    setTimeout(()=>{ if(idbPromise){ idbPromise.catch(()=>{}); setTimeout(()=>{ idbPromise=null; },60000); } },0);
+  });
+  idbPromise.catch(()=>{ setTimeout(()=>{ idbPromise=null; },60000); });
+  return idbPromise;
+}
+async function dbAll(){
+  try{
+    const db=await getIdb();
+    return await new Promise((res,rej)=>{
+      const req=db.transaction('wrong','readonly').objectStore('wrong').getAll();
+      req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);
+    });
+  }catch(e){ return lsAll(); }
+}
+async function dbAdd(entry){
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').add(entry);
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  const arr=lsAll(); let maxId=0; arr.forEach(x=>{ if(x.id>maxId)maxId=x.id; });
+  entry.id=maxId+1; arr.push(entry); lsSave(arr);
+}
+async function dbDel(id){
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').delete(id);
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  lsSave(lsAll().filter(x=>x.id!==id));
+}
+async function dbClear(){
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').clear();
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  lsSave([]);
+}
+function recordWrong(entry){
+  dbAdd({...entry, time:Date.now()}).then(()=>updateWrongCount()).catch(e=>console.warn('错题保存失败',e));
+}
+async function updateWrongCount(){
+  try{ const all=await dbAll(); const el=$('wrong-count'); if(el)el.textContent=all.length; }catch(e){}
+}
+function showWrongBook(){ showScreen('wrongbook'); renderWrongList(); }
+let hideAns=true;
+function toggleAns(){
+  hideAns=!hideAns;
+  $('ans-toggle').textContent = hideAns ? '👁 显示答案' : '🙈 隐藏答案';
+  applyAnsState();
+}
+function applyAnsState(){
+  const list=$('wrong-list');
+  if(list) list.classList.toggle('hide-ans',hideAns);
+}
+const GAME_NO={'整十数除法':1,'试商填空':2,'调商':3,'商不变余数':4,'竖式改错':5,'商不变简便':6,'大法官':7};
+function redoWrong(label){
+  const n=GAME_NO[label];
+  if(n){ startGame(n); fromWrong=true; }
+  else showHome();
+}
+async function renderWrongList(){
+  const list=$('wrong-list');
+  let all=[];
+  try{ all=(await dbAll()).sort((a,b)=>b.time-a.time); }
+  catch(e){ list.innerHTML='<p style="text-align:center;color:#999">读取失败，请刷新重试</p>'; return; }
+  $('wrong-total').textContent=all.length;
+  if(!all.length){ list.innerHTML='<p style="text-align:center;color:#999;padding:30px 0">还没有错题，太棒了！🎉</p>'; return; }
+  list.innerHTML=all.map(w=>`
+    <div class="wrong-item">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span class="badge">${w.game}</span>
+        <span style="font-size:12px;color:#aaa">${new Date(w.time).toLocaleString('zh-CN')}</span>
+      </div>
+      <p style="font-size:15px;line-height:1.7;margin:8px 0 4px;font-weight:bold">${w.title}</p>
+      <div class="ansline">
+        <p style="font-size:14px;margin:6px 0"><span style="color:#b83232">你的答案：${w.user}</span> ｜ <span style="color:#1d7a4a;font-weight:bold">正确答案：${w.correct}</span></p>
+        <p style="font-size:13px;color:#666;line-height:1.6;margin:4px 0 10px">💡 ${w.explain}</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="small-btn" onclick="delWrong(${w.id})">已掌握，删掉 ✓</button>
+        <button class="small-btn" onclick="redoWrong('${w.game}')">🔁 再次练习</button>
+      </div>
+    </div>`).join('');
+  applyAnsState();
+}
+async function delWrong(id){ await dbDel(id); renderWrongList(); updateWrongCount(); }
+async function clearWrongAll(){
+  if(!confirm('确定清空所有错题吗？清空后找不回来了。'))return;
+  await dbClear(); renderWrongList(); updateWrongCount();
+}
+updateWrongCount();
+</script>
+</body>
+</html>

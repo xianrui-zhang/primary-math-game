@@ -35,7 +35,7 @@
   .progress-bar { height:100%; background:linear-gradient(90deg,#38bdf8,#4ade80); width:0%; transition:width .4s; }
   .expr { font-size:26px; font-weight:bold; color:#0c4a6e; text-align:center; margin:14px 0; }
   .expr small { display:block; font-size:13px; color:#9aa8bd; margin-top:4px; font-weight:normal; }
-  .shu { font-family:"SF Mono",Menlo,Consolas,monospace; font-size:20px; text-align:left; background:#f8fafc; border:1.5px solid #dbeafe; border-radius:12px; padding:12px 18px; line-height:1.5; display:inline-block; margin:10px auto; }
+  .shu { font-family:"SF Mono",Menlo,Consolas,monospace; font-size:20px; text-align:left; background:#f8fafc; border:1.5px solid #dbeafe; border-radius:12px; padding:12px 18px; line-height:1.5; display:inline-block; margin:10px auto; white-space:pre; }
   .shu .bad { color:#dc2626; font-weight:bold; }
   .shu-wrap { text-align:center; }
   .options { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
@@ -346,15 +346,16 @@ function markAll(listId,btn,ok,correct){
 /* 竖式渲染 */
 function buildShu(q,d,a,pd,r,highlight){
   const w=String(a).length+3;
-  const pad=(s)=>{ s=String(s); return ' '.repeat(Math.max(0,w-s.length))+s; };
+  const pad=s=>{ s=String(s); return ' '.repeat(Math.max(0,w-s.length))+s; };
   const hl=x=>highlight?`<span class="bad">${x}</span>`:x;
+  const ind=' '.repeat(w+1);
   return [
-    pad(q),
-    pad(d)+' ┌'+ '─'.repeat(w),
-    pad('')+'│ '+pad(a),
-    ' '.repeat(2+w)+hl(pad(pd)),
-    ' '.repeat(1)+'┌'+'─'.repeat(w+1),
-    ' '.repeat(2+w)+hl(pad(r))
+    ind+pad(q),
+    pad(d)+' ┌'+'─'.repeat(w),
+    ind+'│ '+pad(a),
+    ind+'│ '+hl(pad(pd)),
+    ind+'│ ─'+'─'.repeat(w-1),
+    ind+'│ '+hl(pad(r))
   ].join('\n');
 }
 
@@ -374,7 +375,7 @@ function g1Ask(){
   g1.correct=hasR?`${q} 余 ${r}`:String(q);
   const question=hasR?`${a} ÷ ${d} = 商几余几？`:`${a} ÷ ${d} = ?`;
   $('g1-question').textContent=question;
-  $('g1-expr').innerHTML=buildShu(hasR?q+' …… '+r:q,d,a,d*q,r,'');
+  $('g1-expr').innerHTML=buildShu(q,d,a,d*q,r,'');
   let pool;
   if(hasR) pool=[`${q+1} 余 ${r}`,`${q} 余 ${r+10}`,`${q+1} 余 ${Math.max(r-10,1)}`];
   else pool=[String(q+1),String(q-1),String(q*10)];

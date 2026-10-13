@@ -27,6 +27,25 @@
   .l9 { background:linear-gradient(135deg,#f857a6,#ff5858); }
   .l10 { background:linear-gradient(135deg,#4776e6,#8e54e9); }
   .l11 { background:linear-gradient(135deg,#16a085,#f4d03f); }
+  .l12 { background:linear-gradient(135deg,#ff9a56,#ff5e62); }
+  /* ---- 气球速爆 ---- */
+  .arena { position:relative; height:300px; background:linear-gradient(180deg,#dff1fb 0%,#f3fbf6 100%); border-radius:16px; overflow:hidden; margin:12px 0 8px; border:2px solid #d8ead9; }
+  .balloon { position:absolute; bottom:-120px; border:none; background:none; padding:0; cursor:pointer; animation:rise linear forwards; -webkit-tap-highlight-color:transparent; }
+  .balloon.paused { animation-play-state:paused; }
+  .bbody { display:block; width:80px; height:98px; border-radius:50% 50% 48% 52%; color:#fff; font-size:22px; font-weight:bold; line-height:98px; text-align:center; box-shadow:inset -8px -12px 0 rgba(0,0,0,.10); text-shadow:0 1px 3px rgba(0,0,0,.2); position:relative; transition:transform .2s, filter .2s, opacity .2s; }
+  .bbody::after { content:''; position:absolute; bottom:-13px; left:50%; transform:translateX(-50%); border:7px solid transparent; border-top-color:rgba(0,0,0,.18); }
+  .bc1 .bbody { background:linear-gradient(160deg,#ff7e5f,#e63946); }
+  .bc2 .bbody { background:linear-gradient(160deg,#43cea2,#185a9d); }
+  .bc3 .bbody { background:linear-gradient(160deg,#f7b733,#fc4a1a); }
+  .bc4 .bbody { background:linear-gradient(160deg,#a18cd1,#6a5acd); }
+  @keyframes rise { from{ transform:translateY(0); } to{ transform:translateY(-480px); } }
+  .balloon.popped .bbody { animation:boom .5s ease-out forwards; }
+  @keyframes boom { 0%{ transform:scale(1); opacity:1; } 45%{ transform:scale(1.45); opacity:.9; box-shadow:0 0 0 14px rgba(255,180,60,.35); } 100%{ transform:scale(1.8); opacity:0; } }
+  .balloon.deflated .bbody { filter:grayscale(1); opacity:.45; transform:scale(.85); }
+  .balloon.reveal .bbody { outline:4px solid #f7b733; outline-offset:3px; }
+  .balloon.fadeout .bbody { opacity:.18; }
+  .fuse { height:12px; background:#eef2f7; border-radius:6px; overflow:hidden; margin:0 0 10px; }
+  .fuse > div { height:100%; background:linear-gradient(90deg,#43cea2,#f7b733,#ff5e62); width:100%; transition:width .1s linear; border-radius:6px; }
   .vst { border-collapse:collapse; font-family:Menlo,Consolas,"Courier New",monospace; font-size:20px; color:#185a9d; background:#f6fbf7; border-radius:14px; margin:10px auto; }
   .vst td { padding:5px 10px; text-align:right; white-space:pre; letter-spacing:1px; }
   .vst td.op { text-align:left; color:#b85c1d; font-weight:bold; }
@@ -88,6 +107,7 @@
         <button class="level-btn l9" onclick="startGame(9)"><span class="icon">🚀</span>竖式乘法<span class="desc">三位数×两位数，竖式填空</span></button>
         <button class="level-btn l10" onclick="startGame(10)"><span class="icon">👀</span>估算能手<span class="desc">大数估算，估大还是估小</span></button>
         <button class="level-btn l11" onclick="startGame(11)"><span class="icon">🧩</span>有趣的算式<span class="desc">找规律：回文数、乘9积、缺8数</span></button>
+        <button class="level-btn l12" onclick="startGame(12)"><span class="icon">🎈</span>气球速爆<span class="desc">限时口算，爆掉正确的气球！</span></button>
       </div>
       <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">数位顺序表 + 读数口诀 + 竖式乘法 + 估算</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
@@ -162,6 +182,25 @@
     </div>
   </div>
 
+  <!-- ============ 游戏 12：气球速爆 ============ -->
+  <div id="game12" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g12-q">1</span>/8 波</span>
+        <span class="badge">⭐ 得分：<span id="g12-score">0</span></span>
+        <span class="badge hidden" id="g12-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g12-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:2px">先算出结果，再在气球<b style="color:#e63946">飞走前</b>爆掉它！</p>
+      <div class="bignum" id="g12-target" style="margin:6px 0 10px"></div>
+      <div class="fuse"><div id="g12-fuse"></div></div>
+      <div class="arena" id="g12-arena"></div>
+      <div class="feedback" id="g12-fb"></div>
+      <button class="big-btn hidden" id="g12-next" onclick="g12Next()">下一波 →</button>
+    </div>
+  </div>
+
   <!-- ============ 错题本 ============ -->
   <div id="wrongbook" class="hidden">
     <div class="card">
@@ -192,14 +231,14 @@
 <script>
 /* ================= 通用 ================= */
 const $ = id => document.getElementById(id);
-const screens = ['home','knowledge','game9','game10','game11','wrongbook','result'];
-function showScreen(name){ screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
+const screens = ['home','knowledge','game9','game10','game11','game12','wrongbook','result'];
+function showScreen(name){ if(name!=='game12') g12Stop(); screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
 function showHome(){ showScreen('home'); }
 function showKnowledge(){ showScreen('knowledge'); }
 let fromWrong=false;
 function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
 function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
-function startGame(n){ fromWrong=false; showScreen('game'+n); [g9Init,g10Init,g11Init][n-9](); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g9Init,g10Init,g11Init,g12Init][n-9](); }
 
 /* ================= 趣味元素：音效 / 飘字 / 撒花 / 连对 ================= */
 let soundOn = true;
@@ -492,6 +531,99 @@ function g11Answer(btn){
 }
 function g11Next(){ if(g11.q>=g11.total){ finishCommon('有趣的算式',g11,'数字规律题：先算出前几行，找到"变多、变长、对称"的规律，再套到下一行。'); } else g11Ask(); }
 
+/* ================= 游戏 12：气球速爆 ================= */
+let g12 = {};
+function g12Stop(){ if(g12.timer){ clearInterval(g12.timer); g12.timer=null; } }
+function g12Init(){ g12={q:0,score:0,total:8,streak:0}; g12Stop(); g12Ask(); }
+/* 出题：三类口算乘法，返回 {a,b,c,explain} */
+function g12Expr(){
+  const t=Math.floor(Math.random()*3);
+  let a,b,c,explain;
+  if(t===0){                       // 两位数 × 一位数
+    a=12+Math.floor(Math.random()*38); b=3+Math.floor(Math.random()*7); c=a*b;
+    const ten=Math.floor(a/10), one=a%10;
+    explain=`口算：${ten}×${b}=${ten*b}，${one}×${b}=${one*b}，${ten*b}+${one*b}=${c}。`;
+  }else if(t===1){                 // 两位数 × 整十数
+    a=11+Math.floor(Math.random()*38); b=(2+Math.floor(Math.random()*9))*10; c=a*b;
+    explain=`口算：先算 ${a}×${b/10}=${a*(b/10)}，再在末尾添 1 个 0，得 ${c}。`;
+  }else{                           // 整十数(三位) × 一位数
+    a=(11+Math.floor(Math.random()*89))*10; b=3+Math.floor(Math.random()*7); c=a*b;
+    explain=`口算：先算 ${a/10}×${b}=${a/10*b}，再在末尾添 1 个 0，得 ${c}。`;
+  }
+  return {a,b,c,explain,e:`${a} × ${b} = ?`};
+}
+/* 干扰项：常见错误模式（漏 0、错位、差一点） */
+function g12Nums(c,a,b){
+  const cands=[c+10,c-10,c+100,c-100,a*(b+1),a*(b-1),(a+1)*b,c*10,c/10];
+  const opts=[String(c)];
+  for(const v of cands){ if(opts.length>=4)break; if(Number.isInteger(v)&&v>0&&!opts.includes(String(v)))opts.push(String(v)); }
+  let d=1; while(opts.length<4){ const v=String(c+d*7); if(!opts.includes(v))opts.push(v); d++; }
+  return shuffleArr(opts);
+}
+function g12Ask(){
+  g12.q++; g12Stop(); g12.locked=false; g12.recorded=false;
+  $('g12-q').textContent=g12.q; $('g12-score').textContent=g12.score;
+  $('g12-bar').style.width=((g12.q-1)/g12.total*100)+'%';
+  $('g12-fb').textContent=''; $('g12-fb').className='feedback'; $('g12-next').classList.add('hidden');
+  const ex=g12Expr();
+  g12.correct=String(ex.c); g12.explain=ex.explain;
+  $('g12-target').textContent=ex.e;
+  const lefts=[6,30,54,78];
+  $('g12-arena').innerHTML=g12Nums(ex.c,ex.a,ex.b).map((n,i)=>
+    `<button class="balloon bc${i+1}" data-ok="${n===g12.correct?1:0}" style="left:${lefts[i]+Math.floor(Math.random()*8)}%; animation-duration:${(13.5+Math.random()*2.5).toFixed(1)}s" onclick="g12Pop(this)"><span class="bbody">${n}</span></button>`
+  ).join('');
+  g12.left=130;                                    // 13 秒（100ms 一跳）
+  $('g12-fuse').style.width='100%';
+  g12.timer=setInterval(g12Tick,100);
+}
+function g12Tick(){
+  g12.left--;
+  $('g12-fuse').style.width=Math.max(0,g12.left/130*100)+'%';
+  if(g12.left<=0){
+    g12Stop(); g12.locked=true;
+    g12.streak=0; setStreak('g12',0); beep('no');
+    document.querySelectorAll('#g12-arena .balloon').forEach(b=>{
+      b.disabled=true; b.classList.add('paused');
+      if(b.dataset.ok==='1') b.classList.add('reveal');
+      else if(!b.classList.contains('deflated')) b.classList.add('fadeout');
+    });
+    g12Record('⏰ 超时没爆到');
+    $('g12-fb').innerHTML=`⏰ 时间到！正确答案：${g12.correct}。${g12.explain}`;
+    $('g12-fb').className='feedback no';
+    $('g12-next').classList.remove('hidden');
+    $('g12-next').textContent = g12.q>=g12.total ? '看看成绩 🏆' : '下一波 →';
+  }
+}
+function g12Record(userTxt){
+  if(g12.recorded) return; g12.recorded=true;
+  recordWrong({game:'速爆', title:'口算：'+$('g12-target').textContent, svg:'', user:userTxt, correct:g12.correct, explain:g12.explain});
+}
+function g12Pop(btn){
+  if(g12.locked) return;
+  if(btn.dataset.ok==='1'){
+    g12.locked=true; g12Stop();
+    btn.classList.add('popped','paused');
+    document.querySelectorAll('#g12-arena .balloon').forEach(b=>{ b.disabled=true; b.classList.add('paused'); if(b!==btn) b.classList.add('fadeout'); });
+    g12.score+=10; g12.streak=(g12.streak||0)+1; setStreak('g12',g12.streak);
+    beep('ok'); popScore('+10 ⭐');
+    $('g12-score').textContent=g12.score;
+    $('g12-fb').innerHTML=`💥 爆得漂亮！${g12.explain}`;
+    $('g12-fb').className='feedback ok';
+    $('g12-next').classList.remove('hidden');
+    $('g12-next').textContent = g12.q>=g12.total ? '看看成绩 🏆' : '下一波 →';
+  }else{
+    btn.disabled=true; btn.classList.add('deflated','paused');
+    g12.streak=0; setStreak('g12',0); beep('no');
+    g12Record('爆错了 '+btn.textContent);
+    $('g12-fb').innerHTML=`❌ ${btn.textContent} 不是结果，气球瘪掉啦～趁时间没到，快爆正确的那个！`;
+    $('g12-fb').className='feedback no';
+  }
+}
+function g12Next(){
+  if(g12.q>=g12.total){ g12Stop(); finishCommon('气球速爆',g12,'口算小窍门：整十数先算非零部分再添 0；两位数×一位数可以拆成整十部分和个位部分分别乘再相加。'); }
+  else g12Ask();
+}
+
 /* ================= 通用结算 ================= */
 function finishCommon(name,g,detail){
   const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
@@ -559,7 +691,7 @@ function applyAnsState(){
   const list=$('wrong-list');
   if(list) list.classList.toggle('hide-ans',hideAns);
 }
-const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8,'竖式':9,'估算':10,'规律':11};
+const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8,'竖式':9,'估算':10,'规律':11,'速爆':12};
 function redoWrong(label){
   const n=GAME_NO[label];
   if(n){ startGame(n); fromWrong=true; }

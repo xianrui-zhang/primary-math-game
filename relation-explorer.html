@@ -19,6 +19,26 @@
   .l1 { background:linear-gradient(135deg,#4776e6,#24c6dc); }
   .l2 { background:linear-gradient(135deg,#f7971e,#ffd200); }
   .l3 { background:linear-gradient(135deg,#f857a6,#c9184a); }
+  .l4 { background:linear-gradient(135deg,#9be15d,#00b09b); }
+  /* ---- 公式配对（拖拽） ---- */
+  .r-slots { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:14px 0 10px; }
+  .r-slot { flex:1; min-width:190px; max-width:240px; border:2.5px dashed #a9c3e8; border-radius:16px; background:#f4f9fd; padding:12px 10px; text-align:center; transition:border-color .15s, background .15s, transform .15s; }
+  .r-slot .slot-title { font-size:16px; font-weight:bold; color:#2b6cb0; }
+  .r-slot .slot-formula { font-size:13px; color:#7a8ba3; margin-top:4px; }
+  .r-slot.hover { border-color:#f7b733; background:#fff8e6; transform:scale(1.04); }
+  .r-slot.filled { border-style:solid; border-color:#2fb56b; background:#e6f9ee; }
+  .r-slot.flash-ok { animation:slotOk .55s; }
+  @keyframes slotOk { 0%{ box-shadow:0 0 0 0 rgba(47,181,107,.55); } 100%{ box-shadow:0 0 0 16px rgba(47,181,107,0); } }
+  .r-slot.wrong-flash { animation:slotNo .45s; }
+  @keyframes slotNo { 0%,100%{ border-color:#a9c3e8; } 40%{ border-color:#e06060; background:#fdeaea; transform:translateX(-4px); } 70%{ transform:translateX(4px); } }
+  .r-pool { display:flex; gap:12px; justify-content:center; align-items:stretch; flex-wrap:wrap; min-height:100px; padding:12px; background:rgba(71,118,230,.07); border-radius:14px; }
+  .drag-card { max-width:235px; background:linear-gradient(135deg,#4776e6,#24c6dc); color:#fff; border:none; border-radius:14px; padding:12px 14px; font-size:13.5px; line-height:1.65; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; text-align:left; font-family:inherit; box-shadow:0 4px 12px rgba(71,118,230,.28); transition:transform .15s, box-shadow .15s; }
+  .drag-card:hover { transform:translateY(-3px); box-shadow:0 8px 18px rgba(71,118,230,.35); }
+  .drag-card.dragging { position:fixed; z-index:96; cursor:grabbing; transform:scale(1.05) rotate(2deg); opacity:.94; box-shadow:0 14px 30px rgba(0,0,0,.30); pointer-events:none; transition:none; }
+  .drag-card.done { background:linear-gradient(135deg,#34d399,#059669); cursor:default; transform:none; width:auto; max-width:none; }
+  .drag-card.shake { animation:cardShake .45s; }
+  @keyframes cardShake { 0%,100%{ margin-left:0; } 25%{ margin-left:-7px; } 75%{ margin-left:7px; } }
+  .drag-hint { text-align:center; font-size:13px; color:#8898ad; margin:4px 0 0; }
   .card-btn { background:linear-gradient(135deg,#2b6cb0,#185a9d); width:100%; }
   .tip { margin-top:12px; background:#fff8e6; border-left:4px solid #f7b733; padding:10px 14px; border-radius:8px; font-size:14px; line-height:1.8; }
   .hidden { display:none !important; }
@@ -84,6 +104,7 @@
         <button class="level-btn l1" onclick="startGame(1)"><span class="icon">🚄</span>基础行程<span class="desc">速度×时间=路程，给俩求仨</span></button>
         <button class="level-btn l2" onclick="startGame(2)"><span class="icon">🛒</span>单价总价<span class="desc">单价×数量=总价，购物应用题</span></button>
         <button class="level-btn l3" onclick="startGame(3)"><span class="icon">🤝</span>相遇问题<span class="desc">速度和×时间=总路程，线段图</span></button>
+        <button class="level-btn l4" onclick="startGame(4)"><span class="icon">🖱</span>公式配对<span class="desc">把题意卡拖到对应的公式槽！</span></button>
       </div>
       <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">行程三公式 + 速度复合单位 + 相遇问题</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
@@ -159,6 +180,25 @@
     </div>
   </div>
 
+  <!-- ============ 游戏 4：公式配对（拖拽） ============ -->
+  <div id="game4" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g4-q">1</span>/8 轮</span>
+        <span class="badge">⭐ 得分：<span id="g4-score">0</span></span>
+        <span class="badge hidden" id="g4-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g4-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:2px">拖动下面的<b>题意卡</b>，放到对应的公式槽里！</p>
+      <div class="r-slots" id="g4-slots"></div>
+      <div class="r-pool" id="g4-pool"></div>
+      <p class="drag-hint">👆 按住卡片拖过去松手就行（手机也能拖）</p>
+      <div class="feedback" id="g4-fb"></div>
+      <button class="big-btn hidden" id="g4-next" onclick="g4Next()">下一轮 →</button>
+    </div>
+  </div>
+
   <!-- ============ 错题本 ============ -->
   <div id="wrongbook" class="hidden">
     <div class="card">
@@ -189,14 +229,14 @@
 <script>
 /* ================= 通用 ================= */
 const $ = id => document.getElementById(id);
-const screens = ['home','knowledge','game1','game2','game3','wrongbook','result'];
+const screens = ['home','knowledge','game1','game2','game3','game4','wrongbook','result'];
 function showScreen(name){ screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
 function showHome(){ showScreen('home'); }
 function showKnowledge(){ showScreen('knowledge'); }
 let fromWrong=false;
 function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
 function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
-function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init][n-1](); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init][n-1](); }
 function shuffleArr(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
 function mkOpts(correct,pool){
   const opts=[correct];
@@ -456,6 +496,139 @@ function g3Answer(btn){
 }
 function g3Next(){ if(g3.q>=g3.total){ finishCommon('相遇问题',g3,'相遇问题先画线段图：速度和×相遇时间=总路程。前提：同时出发、两地、相向而行。'); } else g3Ask(); }
 
+/* ================= 游戏 4：公式配对（拖拽） ================= */
+let g4 = {};
+const G4_SLOTS={
+  dist:{icon:'🚄', name:'路程', formula:'速度 × 时间', hint:'一个速度行一段时间，求一共行多远——用"速度 × 时间"。'},
+  total:{icon:'🛒', name:'总价', formula:'单价 × 数量', hint:'有"每个多少钱"和"买多少个"，求一共花多少钱——用"单价 × 数量"。'},
+  meet:{icon:'🤝', name:'相遇路程', formula:'速度和 × 时间', hint:'两个速度加起来是速度和，再乘时间——用"速度和 × 时间"。'}
+};
+function g4Init(){ g4={q:0,score:0,total:8,streak:0}; g4Ask(); }
+function g4MakeCard(kind){
+  if(kind==='dist'){
+    const veh=['汽车','一列火车','一辆客车','高铁'][Math.floor(Math.random()*4)];
+    const v=40+5*Math.floor(Math.random()*17), t=2+Math.floor(Math.random()*8);
+    return {kind, text:`${veh}每小时行 ${v} 千米，行了 ${t} 小时，一共行多少千米？`, ans:`速度×时间 = ${v}×${t} = ${v*t} 千米`};
+  }
+  if(kind==='total'){
+    const [name,unit]=G2_GOODS[Math.floor(Math.random()*G2_GOODS.length)];
+    const p=4+Math.floor(Math.random()*46), q=3+Math.floor(Math.random()*9);
+    return {kind, text:`文具店每${unit}${name} ${p} 元，买 ${q}${unit}要花多少钱？`, ans:`单价×数量 = ${p}×${q} = ${p*q} 元`};
+  }
+  const va=30+5*Math.floor(Math.random()*15), vb=20+5*Math.floor(Math.random()*9), t=2+Math.floor(Math.random()*5);
+  return {kind, text:`甲车每小时行 ${va} 千米，乙车每小时行 ${vb} 千米，两车同时出发相向而行，${t} 小时相遇，两地相距多少千米？`, ans:`速度和×时间 = (${va}+${vb})×${t} = ${(va+vb)*t} 千米`};
+}
+function g4Ask(){
+  g4.q++; g4.locked=false; g4.dirty=false;
+  $('g4-q').textContent=g4.q; $('g4-score').textContent=g4.score;
+  $('g4-bar').style.width=((g4.q-1)/g4.total*100)+'%';
+  $('g4-fb').textContent=''; $('g4-fb').className='feedback'; $('g4-next').classList.add('hidden');
+  const kinds=shuffleArr(['dist','total','meet']);
+  // 槽（顺序打乱）
+  $('g4-slots').innerHTML=kinds.map(k=>{
+    const s=G4_SLOTS[k];
+    return `<div class="r-slot" data-kind="${k}"><div class="slot-title">${s.icon} ${s.name}</div><div class="slot-formula">${s.formula}</div></div>`;
+  }).join('');
+  // 卡（顺序打乱）
+  const cards=kinds.map(g4MakeCard);
+  g4.cards=cards;
+  $('g4-pool').innerHTML=cards.map((c,i)=>`<button class="drag-card" data-kind="${c.kind}" data-i="${i}">${c.text}</button>`).join('');
+  [...$('g4-pool').querySelectorAll('.drag-card')].forEach(el=>g4BindDrag(el));
+}
+/* ---- 指针拖拽（鼠标+触屏通用） ---- */
+function g4BindDrag(card){
+  card.addEventListener('pointerdown',e=>{
+    if(g4.locked||card.classList.contains('done')||g4.dragging)return;
+    e.preventDefault();
+    const r=card.getBoundingClientRect();
+    card.style.width=r.width+'px';
+    card.style.left=r.left+'px';
+    card.style.top=r.top+'px';
+    card.classList.add('dragging');
+    g4.dragging=card;
+    try{ card.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  card.addEventListener('pointermove',e=>{
+    if(g4.dragging!==card)return;
+    card.style.left=e.clientX+'px';
+    card.style.top=e.clientY+'px';
+    // 高亮指针下的槽
+    const under=document.elementFromPoint(e.clientX,e.clientY);
+    const slot=under?under.closest('.r-slot'):null;
+    document.querySelectorAll('.r-slot').forEach(s=>s.classList.toggle('hover',s===slot&&s.dataset.kind===card.dataset.kind));
+  });
+  card.addEventListener('pointerup',e=>{ if(g4.dragging===card) g4Drop(card,e); });
+  card.addEventListener('pointercancel',e=>{ if(g4.dragging===card) g4Drop(card,e); });
+}
+function g4Drop(card,e){
+  g4.dragging=null;
+  // 悬浮时卡片 pointer-events:none，elementFromPoint 拿到的是下面那层
+  const under=document.elementFromPoint(e.clientX,e.clientY);
+  const slot=under?under.closest('.r-slot'):null;
+  const wasLeft=parseFloat(card.style.left)||0, wasTop=parseFloat(card.style.top)||0;
+  card.classList.remove('dragging');
+  card.style.left=card.style.top=card.style.width='';
+  document.querySelectorAll('.r-slot').forEach(s=>s.classList.remove('hover'));
+  if(slot && slot.dataset.kind===card.dataset.kind){
+    // 配对成功
+    slot.appendChild(card);
+    card.classList.add('done');
+    slot.classList.add('filled','flash-ok');
+    setTimeout(()=>slot.classList.remove('flash-ok'),600);
+    beep('ok');
+    $('g4-fb').textContent='';
+    if([...$('g4-slots').querySelectorAll('.r-slot')].every(s=>s.classList.contains('filled'))){
+      g4.locked=true;
+      const first=!g4.dirty;
+      if(first){ g4.score+=10; g4.streak=(g4.streak||0)+1; }
+      else{ g4.score+=5; g4.streak=0; }
+      setStreak('g4',g4.streak);
+      beep('win'); popScore(first?'+10 ⭐':'+5 ⭐'); confetti();
+      $('g4-score').textContent=g4.score;
+      const fb=$('g4-fb');
+      fb.innerHTML=`🎉 这一轮配对成功！${first?'':'（有拖错的，这轮只得 5 分）'}<br>${g4.cards.map(c=>`「${G4_SLOTS[c.kind].name}」→ ${c.ans}`).join('<br>')}`;
+      fb.className='feedback ok';
+      $('g4-next').classList.remove('hidden');
+      $('g4-next').textContent = g4.q>=g4.total ? '看看成绩 🏆' : '下一轮 →';
+    }
+  }else if(slot){
+    // 拖到了错误的槽：弹回 + 提示
+    slot.classList.add('wrong-flash');
+    setTimeout(()=>slot.classList.remove('wrong-flash'),500);
+    const cardData=g4.cards[Number(card.dataset.i)];
+    card.dataset.tried='1';
+    if(!card.dataset.recorded){
+      card.dataset.recorded='1';
+      g4.dirty=true;
+      recordWrong({game:'配对', title:cardData.text, svg:'', user:`拖到了「${G4_SLOTS[slot.dataset.kind].name}」`, correct:`应拖到「${G4_SLOTS[cardData.kind].name}」`, explain:G4_SLOTS[cardData.kind].hint});
+    }
+    g4BounceBack(card,wasLeft,wasTop);
+    beep('no');
+    const fb=$('g4-fb');
+    fb.innerHTML=`🐸❌ 这张卡不是在算「${G4_SLOTS[slot.dataset.kind].name}」哦！💡 ${G4_SLOTS[cardData.kind].hint}`;
+    fb.className='feedback no';
+  }else{
+    // 拖到空白处：安静弹回
+    g4BounceBack(card,wasLeft,wasTop);
+  }
+}
+/* FLIP 弹回：从松手位置平滑飞回卡池原位 */
+function g4BounceBack(card,wasLeft,wasTop){
+  const now=card.getBoundingClientRect();
+  const dx=wasLeft-now.left, dy=wasTop-now.top;
+  card.style.transition='none';
+  card.style.transform=`translate(${dx}px,${dy}px)`;
+  void card.offsetWidth;
+  card.style.transition='transform .3s ease-out';
+  card.style.transform='';
+  card.classList.add('shake');
+  setTimeout(()=>{ card.style.transition=''; card.classList.remove('shake'); },320);
+}
+function g4Next(){
+  if(g4.q>=g4.total){ finishCommon('公式配对',g4,'三大数量关系：速度×时间=路程；单价×数量=总价；速度和×时间=相遇路程。拿到题先问自己：它是在求哪个量？'); }
+  else g4Ask();
+}
+
 /* ================= 通用结算 ================= */
 function finishCommon(name,g,detail){
   const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
@@ -549,7 +722,7 @@ function applyAnsState(){
   const list=$('wrong-list');
   if(list) list.classList.toggle('hide-ans',hideAns);
 }
-const GAME_NO={'行程':1,'单价':2,'相遇':3};
+const GAME_NO={'行程':1,'单价':2,'相遇':3,'配对':4};
 function redoWrong(label){
   const n=GAME_NO[label];
   if(n){ startGame(n); fromWrong=true; }

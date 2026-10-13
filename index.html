@@ -146,7 +146,7 @@
 <div class="container">
   <button id="sound-toggle" onclick="toggleSound()" title="音效开关">🔊</button>
   <h1>📐 角度探险家</h1>
-  <div class="subtitle">北师大版 · 数学四年级上册 · 第二单元《线与角》 · 玩中学 · v2.1</div>
+  <div class="subtitle">北师大版 · 数学四年级上册 · 第二单元《线与角》 · 玩中学 · v2.2</div>
 
   <!-- ============ 首页 ============ -->
   <div id="home">
@@ -181,7 +181,7 @@
         🧭 <b>量角器口诀：</b>点对点（中心点对顶点）、线对边（零刻度线对一条边）、
         读数要看另一边；<b>0° 在内圈就读内圈，0° 在外圈就读外圈</b>，千万别读反啦！<br>
         ✏️ <b>角的组成：</b>一个顶点 + 两条边，角的符号是 "∠"，记作 ∠1。<br>
-        📄 <b>折叠题钥匙：</b>① 折叠前后角<b>相等</b>（翻过去的角 = 被盖住的角）；② 直角里折叠：∠2 = 90° − ∠1 × 2；③ 平角里折叠：∠2 = (180° − ∠1) ÷ 2 或 ∠2 = 180° − ∠1 × 2（看已知的是哪个角）；④ 两边折到完全重合：折痕平分直角，各是 45°。
+        📄 <b>折叠题钥匙：</b>① 折叠前后角<b>相等</b>（翻过去的角 = 被盖住的角）；② 直角里折叠：∠2 = 90° − ∠1 × 2；③ 平角里折叠：∠2 = ∠3（折叠相等），且 ∠1 和 ∠3 沿折痕拼成平角 → ∠3 = 180° − ∠1；④ 两边折到完全重合：折痕平分直角，各是 45°；⑤ <b>周角（圆纸对折）</b>：整圆是 360°，每对折一次角减半：360° → 180°（平角）→ 90°（直角）→ 45°。
       </div>
       <button class="big-btn" onclick="showHome()">我知道啦，去闯关！🚀</button>
     </div>
@@ -740,7 +740,7 @@ function arcPath(cx,cy,rr,s,e){
 function arcLabel(cx,cy,rr,s,e,text,color){
   const r=Math.PI/180, m=(s+e)/2;
   const x=cx+rr*Math.cos(-m*r), y=cy+rr*Math.sin(-m*r);
-  return `<text x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" font-size="15" font-weight="bold" fill="${color}" text-anchor="middle">${text}</text>`;
+  return `<text x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" font-size="15" font-weight="bold" fill="${color}" text-anchor="middle" stroke="#fff" stroke-width="4" paint-order="stroke" stroke-linejoin="round">${text}</text>`;
 }
 function shuffleArr(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
 
@@ -822,27 +822,35 @@ function g5SVG_B(a1){
     <text id="g5-eq" x="200" y="24" font-size="16" font-weight="bold" fill="#00a070" text-anchor="middle" opacity="0">✨ 折叠前后角相等：∠2 = ∠3！✨</text>
   </svg>`;
 }
-/* 变体C：∠1+∠2=180°（平角） —— 带扫过动画 */
-function g5SVG_C(a1){
-  const a2=180-a1, cx=200, cy=150, len=120;
-  const rx=cx+len*Math.cos(-a1*G5R), ry=cy+len*Math.sin(-a1*G5R);
-  return `<svg width="400" height="200" viewBox="0 0 400 200">
-    <line x1="${cx-135}" y1="${cy}" x2="${cx+135}" y2="${cy}" stroke="#4a6fa5" stroke-width="4" stroke-linecap="round"/>
-    <g id="g5-flap" transform="rotate(0 ${cx} ${cy})">
-      <polygon points="${cx},${cy} ${cx+118},${cy} ${cx+118},${cy-9}" fill="rgba(255,154,86,.35)" stroke="#ff9a56" stroke-width="2"/>
-    </g>
-    <line x1="${cx}" y1="${cy}" x2="${rx.toFixed(1)}" y2="${ry.toFixed(1)}" stroke="#ff6b6b" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="${cx}" cy="${cy}" r="5" fill="#333"/>
-    <path d="${arcPath(cx,cy,46,0,a1)}" fill="none" stroke="#f7b733" stroke-width="3"/>
-    <path id="g5-arc2" d="${arcPath(cx,cy,46,a1,180)}" fill="none" stroke="#2fb56b" stroke-width="3"/>
-    ${arcLabel(cx,cy,64,0,a1,'∠1','#e08832')}
-    ${arcLabel(cx,cy,64,a1,180,'∠2','#1d7a4a')}
-    <text id="g5-eq" x="200" y="24" font-size="17" font-weight="bold" fill="#00a070" text-anchor="middle" opacity="0">✨ 直线上剩下的部分就是 ∠2！✨</text>
+/* 变体C：圆形纸对折（周角360°减半）—— 折1次=平角180°，2次=直角90°，3次=45°（带合拢动画） */
+function g5SVG_C(folds){
+  const cx=200, cy=105, R=78, r=Math.PI/180;
+  const target=360/Math.pow(2,folds);
+  const tx=cx+R*Math.cos(-target*r), ty=cy+R*Math.sin(-target*r);
+  const large=target>180?1:0;
+  const aR=32;
+  const bx=cx+aR*Math.cos(-target*r), by=cy+aR*Math.sin(-target*r);
+  // 折痕：第1折是水平折痕，第2折竖直，第3折45°
+  let creases=`<line x1="${cx-R}" y1="${cy}" x2="${cx+R}" y2="${cy}" stroke="#c9b8e8" stroke-width="2" stroke-dasharray="5 4"/>`;
+  if(folds>=2) creases+=`<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy-R}" stroke="#c9b8e8" stroke-width="2" stroke-dasharray="5 4"/>`;
+  if(folds>=3) creases+=`<line x1="${cx}" y1="${cy}" x2="${(cx+R*Math.cos(-45*r)).toFixed(1)}" y2="${(cy-R*Math.sin(-45*r)).toFixed(1)}" stroke="#c9b8e8" stroke-width="2" stroke-dasharray="5 4"/>`;
+  return `<svg width="400" height="210" viewBox="0 0 400 210">
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="rgba(255,154,86,.12)" stroke="#b8c4d6" stroke-width="2" stroke-dasharray="6 5"/>
+    <path id="g5-sector" d="M ${cx} ${cy} L ${cx+R} ${cy} A ${R} ${R} 0 ${large} 0 ${tx.toFixed(1)} ${ty.toFixed(1)} Z" fill="rgba(255,154,86,.4)" stroke="#ff9a56" stroke-width="2.5"/>
+    ${creases}
+    <line x1="${cx}" y1="${cy}" x2="${cx+R}" y2="${cy}" stroke="#4a6fa5" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${cy}" x2="${tx.toFixed(1)}" y2="${ty.toFixed(1)}" stroke="#4a6fa5" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="4.5" fill="#333"/>
+    <path id="g5-arc1" d="${arcPath(cx,cy,aR,0,target)}" fill="none" stroke="#f7b733" stroke-width="3"/>
+    ${arcLabel(cx,cy,50,0,target,'∠1','#e08832')}
+    <text x="330" y="26" font-size="12" fill="#9aa8bd">虚线=整张圆纸</text>
+    <text x="330" y="44" font-size="12" fill="#8a6fb8">折痕- - -</text>
+    <text id="g5-eq" x="180" y="24" font-size="15" font-weight="bold" fill="#00a070" text-anchor="middle" opacity="0">✨ 周角360°，每对折一次角就减半！✨</text>
   </svg>`;
 }
 /* 变体D：长方形右半部分沿折痕折起来 —— ∠1=∠3（折叠相等），∠2=180°−∠1×2（带翻纸动画） */
 function g5SVG_D(a1){
-  const c=(180-a1)/2, r=G5R;
+  const c=a1, r=G5R; // ∠1 就等于折痕与虚线边的夹角 c
   const TLx=60, TLy=160, TRx=340, TRy=160, BLx=60, BLy=260, BRx=340, BRy=260;
   const Px=160, Py=260;
   const t=100/Math.sin(c*r);
@@ -864,14 +872,15 @@ function g5SVG_D(a1){
       <polygon points="${Px},${Py} ${BRx},${BRy} ${TRx},${TRy} ${Qx.toFixed(1)},${Qy}" fill="rgba(255,154,86,.4)" stroke="#ff9a56" stroke-width="2.5"/>
     </g>
     <circle cx="${Qx.toFixed(1)}" cy="${Qy}" r="4.5" fill="#333"/>
-    <path id="g5-arc3" d="${arcPath(Qx,Qy,24,0,c)}" fill="none" stroke="#2fb56b" stroke-width="3"/>
-    <path id="g5-arc1" d="${arcPath(Qx,Qy,24,c,2*c)}" fill="none" stroke="#2fb56b" stroke-width="3"/>
-    <path d="${arcPath(Qx,Qy,34,2*c,180)}" fill="none" stroke="#f7b733" stroke-width="3"/>
-    ${arcLabel(Qx,Qy,38,0,c,'∠3','#1d7a4a')}
-    ${arcLabel(Qx,Qy,38,c,2*c,'∠1','#e08832')}
-    ${arcLabel(Qx,Qy,48,2*c,180,'∠2','#1d7a4a')}
+    <path id="g5-arc1" d="${arcPath(Qx,Qy,26,0,c)}" fill="none" stroke="#f7b733" stroke-width="3"/>
+    <path id="g5-arc2" d="${arcPath(Qx,Qy,46,2*c,c+180)}" fill="none" stroke="#2fb56b" stroke-width="3.5"/>
+    <path id="g5-arc3" d="${arcPath(Qx,Qy,46,c+180,360)}" fill="none" stroke="#2fb56b" stroke-width="3.5"/>
+    ${arcLabel(Qx,Qy,42,0,c,'∠1','#e08832')}
+    ${arcLabel(Qx,Qy,62,2*c,c+180,'∠2','#1d7a4a')}
+    ${arcLabel(Qx,Qy,62,c+180,360,'∠3','#1d7a4a')}
+    <text x="${(Ex+6).toFixed(1)}" y="${(Ey+4).toFixed(1)}" font-size="12" fill="#8a6fb8" stroke="#fff" stroke-width="3" paint-order="stroke">折痕</text>
     <text x="238" y="252" font-size="12" fill="#9aa8bd">虚线 = 纸原来的位置</text>
-    <text id="g5-eq" x="200" y="24" font-size="16" font-weight="bold" fill="#00a070" text-anchor="middle" opacity="0">✨ 折叠前后角相等：∠3 = ∠1！✨</text>
+    <text id="g5-eq" x="200" y="24" font-size="16" font-weight="bold" fill="#00a070" text-anchor="middle" opacity="0">✨ 折叠前后角相等：∠2 = ∠3！✨</text>
   </svg>`;
 }
 /* 变体E：把左下角折起来使两条边完全重合 —— 折痕平分直角，∠1=∠2=45°（带翻纸动画） */
@@ -916,8 +925,16 @@ function g5PlayAnim(){
   const btn=$('g5-anim'); btn.disabled=true; g5.animating=true;
   const finish=()=>{ btn.disabled=false; g5.animating=false; };
   if(g5.variant==='C'){
-    // 红边从右边水平位置扫到 ∠1 的位置，直线上剩下 ∠2
-    g5RunRotate(0,-g5.a1,1400,200,150,()=>{ g5Flash(['g5-arc2']); finish(); });
+    // 周角对折：圆扇面从 360° 一路合拢到目标角，直观看到"每折一次减半"
+    const R=78, cx=200, cy=105, sector=$('g5-sector');
+    const target=360/Math.pow(2,g5.folds);
+    beep('flip');
+    g5Tween(360,target,2200,a=>{
+      const rad=a*Math.PI/180;
+      const x=cx+R*Math.cos(rad), y=cy-R*Math.sin(rad);
+      const large=a>180?1:0;
+      sector.setAttribute('d',`M ${cx} ${cy} L ${cx+R} ${cy} A ${R} ${R} 0 ${large} 0 ${x.toFixed(1)} ${y.toFixed(1)} Z`);
+    },()=>{ g5Flash(['g5-arc1']); finish(); });
     return;
   }
   const pivot = (g5.variant==='A'||g5.variant==='E') ? [60,145] : [160,260];
@@ -930,8 +947,8 @@ function g5PlayAnim(){
   g5Tween(-1,1,700,set,()=>{          // 先展开铺平（露出虚线原位）
     beep('flip');
     g5Tween(1,-1,1600,set,()=>{       // 再沿折痕翻折上去
-      if(g5.variant==='A'||g5.variant==='D') g5Flash(['g5-arc1','g5-arc3']);
-      else if(g5.variant==='E') g5Flash(['g5-arc1','g5-arc2']);
+      if(g5.variant==='A') g5Flash(['g5-arc1','g5-arc3']);
+      else if(g5.variant==='D'||g5.variant==='E') g5Flash(['g5-arc2','g5-arc3']);
       else g5Flash(['g5-arc2','g5-arc3']);
       finish();
     });
@@ -983,29 +1000,35 @@ function g5Ask(){
     question=`一张长方形纸沿折痕把右半部分折起来以后如图（虚线是纸原来的位置）。已知 ∠1 = ${a1}°，∠2 是多少度？`;
     explain=`∠1、∠2、∠3 拼成一个平角：∠1 + ∠2 + ∠3 = 180°。折叠前后角相等，∠2 = ∠3，所以 ∠2 = (180 − ${a1}) ÷ 2 = ${a2}°。`;
   }else if(variant==='D'){
-    a1=[30,40,50,60,70,80][Math.floor(Math.random()*6)];
-    g5.c=(180-a1)/2;
-    const a2=180-2*a1;
+    a1=[40,50,60,70][Math.floor(Math.random()*4)];
+    g5.c=a1;
+    const a2=180-a1;
     svg=g5SVG_D(a1); answer=a2;
-    question=`一张长方形纸沿折痕折起来以后如图（虚线是纸原来的位置）。已知 ∠1 = ${a1}°，∠2 是多少度？`;
-    explain=`∠1、∠2、∠3 拼成一个平角180°。折叠前后角相等，∠3 = ∠1 = ${a1}°，所以 ∠2 = 180 − ${a1} × 2 = ${a2}°。`;
+    question=`一张长方形纸沿折痕把右半部分折起来以后如图（虚线是纸原来的位置）。已知 ∠1 = ${a1}°，∠3 是多少度？`;
+    explain=`沿折痕看，∠1 和 ∠3 合起来正好是平角 180°，所以 ∠3 = 180 − ${a1} = ${a2}°。折叠前后角相等，翻折过去的角 ∠2 = ∠3 = ${a2}°。`;
   }else if(variant==='E'){
     a1=45; g5.c=45;
     svg=g5SVG_E(); answer=45;
     question=`把长方形纸的左下角沿折痕向上折，使左边的边和下面的边完全重合（如图，虚线是纸原来的位置）。∠1 是多少度？`;
     explain=`两条边完全重合，说明折痕正好把 90° 的直角平均分成两半：∠1 = ∠2 = 90° ÷ 2 = 45°。`;
-  }else{
-    a1=[40,60,70,110,120,135,150][Math.floor(Math.random()*7)];
-    const a2=180-a1;
-    svg=g5SVG_C(a1); answer=a2;
-    question=`∠1 和 ∠2 拼成了一个平角。已知 ∠1 = ${a1}°，∠2 是多少度？`;
-    explain=`平角 = 180°：∠1 + ∠2 = 180°，所以 ∠2 = 180 − ${a1} = ${a2}°。`;
+  }else if(variant==='C'){
+    g5.folds=1+Math.floor(Math.random()*3);
+    const a2=360/Math.pow(2,g5.folds);
+    svg=g5SVG_C(g5.folds); answer=a2;
+    question=`把一张圆形纸片对折 ${g5.folds} 次（如图），得到的角是多少度？`;
+    explain=`整张圆纸是一个周角 360°。每对折一次，角就<b>减半</b>：360° → 对折1次 180°（平角）→ 对折2次 90°（直角）→ 对折3次 45°。对折 ${g5.folds} 次得到 ${a2}°。`;
   }
-  $('g5-hint').style.display = variant==='C' ? 'none' : '';
   g5.a1=a1; g5.answer=answer; g5.explain=explain;
   $('g5-question').textContent=question;
   $('g5-stage').innerHTML=svg;
-  const opts=g5MakeOptions(answer,[180-answer,answer===90?60:90,Math.max(answer-10,10),Math.min(answer+10,170),answer+15,answer-15,180-answer+10]);
+  let opts;
+  if(variant==='C'){
+    opts=g5MakeOptions(answer,[45,90,180,270,135].filter(x=>x!==answer));
+  }else if(variant==='D'){
+    opts=g5MakeOptions(answer,[a1,180-2*a1,answer-10,answer+10,90].filter(x=>x!==answer&&x>0));
+  }else{
+    opts=g5MakeOptions(answer,[180-answer,answer===90?60:90,Math.max(answer-10,10),Math.min(answer+10,170),answer+15,answer-15,180-answer+10]);
+  }
   $('g5-options').innerHTML=opts.map(o=>`<button class="opt-btn" onclick="g5Answer(${o},this)">${o}°</button>`).join('');
 }
 function g5Answer(val,btn){
@@ -1160,7 +1183,7 @@ function g7Ask(){
   $('g7-q').textContent=g7.q; $('g7-score').textContent=g7.score;
   $('g7-bar').style.width=((g7.q-1)/g7.total*100)+'%';
   $('g7-fb').textContent=''; $('g7-fb').className='feedback'; $('g7-next').classList.add('hidden');
-  const types=['clock','clockHalf','trisq','rays','comp','fact'];
+  const types=['clock','clockHalf','trisq','rays','comp','clockType','rot','classif','nontri','fact'];
   let type=types[Math.floor(Math.random()*types.length)];
   while(type===g7.lastType) type=types[Math.floor(Math.random()*types.length)];
   g7.lastType=type;
@@ -1207,6 +1230,47 @@ function g7Ask(){
       explain=`直角是90°：∠2 = 90 − ${a1} = ${answer}°。`;
     }
     pool=[answer+10,answer-10,answer+20,answer-20,90,180];
+  }else if(type==='clockType'){
+    unit='';
+    const half=Math.random()<0.4;
+    const h=1+Math.floor(Math.random()*11);
+    const angle=half?Math.abs(30*h+15-180):30*Math.min(h,12-h);
+    const tp=angle===90?'直角':(angle===180?'平角':(angle<90?'锐角':'钝角'));
+    answer=tp;
+    question=`${h}时${half?'30分':'整'}（如图），时针和分针的夹角是什么角？`;
+    explain=`夹角是 ${angle}°：${angle<90?'大于0°而小于90°，是锐角':angle===90?'正好90°，是直角':angle<180?'大于90°而小于180°，是钝角':'正好180°，是平角'}。`;
+    svg=clockSVG(h,half);
+    pool=['锐角','直角','钝角','平角'];
+  }else if(type==='rot'){
+    if(Math.random()<0.5){
+      const k=1+Math.floor(Math.random()*11);
+      answer=30*k;
+      question=`钟面上，分针从"12"走到"${k}"，转过了多少度？`;
+      explain=`分针每走 1 大格转 30°，从 12 走到 ${k} 共 ${k} 大格：30°×${k}=${answer}°。`;
+      pool=[answer+30,answer-30,360,180,90];
+    }else{
+      const gap=1+Math.floor(Math.random()*6);
+      const a=1+Math.floor(Math.random()*(11-gap));
+      const b=a+gap;
+      answer=30*gap;
+      question=`从 ${a}:00 到 ${b}:00，时针转过了多少度？`;
+      explain=`时针从 ${a} 走到 ${b}，走了 ${gap} 大格：30°×${gap}=${answer}°。`;
+      pool=[answer+30,answer-30,360,180,90];
+    }
+  }else if(type==='classif'){
+    unit='';
+    const deg=[35,45,60,75,89,90,91,100,120,150,178,180,360][Math.floor(Math.random()*13)];
+    const tp=deg===90?'直角':(deg===180?'平角':(deg===360?'周角':(deg<90?'锐角':'钝角')));
+    answer=tp;
+    question=`一个 ${deg}° 的角是什么角？`;
+    explain=`${deg}° ${tp==='锐角'?'大于0°而小于90°，是锐角':tp==='直角'?'正好90°，是直角':tp==='钝角'?'大于90°而小于180°，是钝角':tp==='平角'?'正好180°，是平角':'正好360°，是周角'}。`;
+    pool=['锐角','直角','钝角','平角','周角'];
+  }else if(type==='nontri'){
+    const bad=[20,25,40,50,55,65,70,80,85,95,100,110,115,125,130,140,145,160,170];
+    answer=bad[Math.floor(Math.random()*bad.length)];
+    question=`下面哪个角用一副三角板拼不出来？`;
+    explain=`三角板上只有 30°、45°、60°、90°，能拼出的角都是它们加减得到的：15°、75°、105°、120°、135°、150°……${answer}° 怎么拼也拼不出来。`;
+    pool=[15,30,45,60,75,90,105,120,135,150];
   }else{
     unit='';
     const facts=[
@@ -1225,13 +1289,18 @@ function g7Ask(){
   g7.answer=answer; g7.explain=explain; g7.unit=unit;
   $('g7-question').textContent=question;
   $('g7-stage').innerHTML=svg;
-  const opts=g5MakeOptions(answer,pool);
-  $('g7-options').innerHTML=opts.map(o=>`<button class="opt-btn" onclick="g7Answer(${o},this)">${o}${unit}</button>`).join('');
+  let opts;
+  if(unit===''){
+    opts=shuffleArr(pool.slice());
+  }else{
+    opts=g5MakeOptions(answer,pool);
+  }
+  $('g7-options').innerHTML=opts.map(o=>`<button class="opt-btn" onclick="g7Answer('${o}',this)">${typeof o==='number'?o+unit:o}</button>`).join('');
 }
 function g7Answer(val,btn){
   const allBtns=$('g7-options').querySelectorAll('.opt-btn');
   allBtns.forEach(b=>b.disabled=true);
-  if(val===g7.answer){
+  if(String(val)===String(g7.answer)){
     btn.classList.add('correct'); g7.score+=10; g7.streak=(g7.streak||0)+1; setStreak('g7',g7.streak); beep('ok'); popScore('+10 ⭐');
     $('g7-fb').className='feedback ok';
   }else{
@@ -1252,7 +1321,7 @@ function g7Finish(){
   $('r-stars').textContent='⭐'.repeat(stars)+(stars<3?'✩'.repeat(3-stars):'');
   $('r-title').textContent = stars===3?'常考题也难不倒你！':(stars===2?'稳扎稳打！':'这些都是考试常客，多刷两遍就熟了～');
   $('r-score').textContent=`得分：${g7.score} / ${max}`;
-  $('r-detail').textContent='常考题型：钟面夹角（每大格30°）、三角板拼角、数角个数（1+2+…）、平角直角组成计算。';
+  $('r-detail').textContent='常考题型：钟面夹角与旋转、角的分类判断、三角板拼角、数角个数、平角直角组成。';
   showScreen('result');
 }
 

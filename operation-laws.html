@@ -319,9 +319,10 @@ function setStreak(base,n){
 function shuffleArr(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
 function mkOpts(correct,pool){
   const opts=[correct];
+  const isNum=/^-?\d+$/.test(String(correct)); // 答案是纯数字时，兜底选项也生成数字
   for(const p of pool){ if(opts.length>=4)break; if(!opts.includes(p))opts.push(p); }
   let d=1;
-  while(opts.length<4){ const v=typeof correct==='number'?correct+d:correct+d+'?'; if(!opts.includes(v))opts.push(v); d++; }
+  while(opts.length<4){ const v=isNum?Number(correct)+d:correct+d; if(!opts.includes(v))opts.push(v); d++; }
   return shuffleArr(opts);
 }
 function mkNumOpts(ans,pool){

@@ -634,45 +634,71 @@ function finishCommon(name,g,detail){
   showScreen('result');
 }
 
-/* ================= 错题本（IndexedDB） ================= */
-function openDB(){
-  return new Promise((res,rej)=>{
-    const req=indexedDB.open('MulExplorerDB',1);
-    req.onupgradeneeded=e=>{ e.target.result.createObjectStore('wrong',{keyPath:'id',autoIncrement:true}); };
-    req.onsuccess=e=>res(e.target.result);
-    req.onerror=()=>rej(req.error);
+/* ================= 错题本存储（IndexedDB 优先，localStorage 兜底） ================= */
+const LS_KEY='MulExplorerDBWrong';
+function lsAll(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
+function lsSave(arr){ try{ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }catch(e){} }
+let idbPromise=null;
+function getIdb(){
+  if(idbPromise!==null) return idbPromise;
+  idbPromise=new Promise((res,rej)=>{
+    try{
+      if(!window.indexedDB){ rej(new Error('环境不支持 IndexedDB')); return; }
+      const req=indexedDB.open('MulExplorerDB',1);
+      req.onupgradeneeded=e=>{ e.target.result.createObjectStore('wrong',{keyPath:'id',autoIncrement:true}); };
+      req.onsuccess=e=>res(e.target.result);
+      req.onerror=()=>rej(req.error||new Error('IndexedDB 打开失败'));
+      req.onblocked=()=>rej(new Error('IndexedDB 被占用'));
+    }catch(e){ rej(e); }
   });
+  idbPromise.catch(()=>{ setTimeout(()=>{ idbPromise=null; },60000); });
+  return idbPromise;
 }
 async function dbAll(){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const req=db.transaction('wrong','readonly').objectStore('wrong').getAll();
-    req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);
-  });
+  try{
+    const db=await getIdb();
+    return await new Promise((res,rej)=>{
+      const req=db.transaction('wrong','readonly').objectStore('wrong').getAll();
+      req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);
+    });
+  }catch(e){ return lsAll(); }
 }
 async function dbAdd(entry){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction('wrong','readwrite');
-    tx.objectStore('wrong').add(entry);
-    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
-  });
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').add(entry);
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  const arr=lsAll(); let maxId=0; arr.forEach(x=>{ if(x.id>maxId)maxId=x.id; });
+  entry.id=maxId+1; arr.push(entry); lsSave(arr);
 }
 async function dbDel(id){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction('wrong','readwrite');
-    tx.objectStore('wrong').delete(id);
-    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
-  });
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').delete(id);
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  lsSave(lsAll().filter(x=>x.id!==id));
 }
 async function dbClear(){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction('wrong','readwrite');
-    tx.objectStore('wrong').clear();
-    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
-  });
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').clear();
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  lsSave([]);
 }
 function recordWrong(entry){
   dbAdd({...entry, time:Date.now()}).then(()=>updateWrongCount()).catch(e=>console.warn('错题保存失败',e));

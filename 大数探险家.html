@@ -24,6 +24,15 @@
   .l6 { background:linear-gradient(135deg,#11998e,#38ef7d); }
   .l7 { background:linear-gradient(135deg,#8e2de2,#4a00e0); }
   .l8 { background:linear-gradient(135deg,#0ba360,#3cba92); }
+  .l9 { background:linear-gradient(135deg,#f857a6,#ff5858); }
+  .l10 { background:linear-gradient(135deg,#4776e6,#8e54e9); }
+  .l11 { background:linear-gradient(135deg,#16a085,#f4d03f); }
+  .vst { border-collapse:collapse; font-family:Menlo,Consolas,"Courier New",monospace; font-size:20px; color:#185a9d; background:#f6fbf7; border-radius:14px; margin:10px auto; }
+  .vst td { padding:5px 10px; text-align:right; white-space:pre; letter-spacing:1px; }
+  .vst td.op { text-align:left; color:#b85c1d; font-weight:bold; }
+  .vst td.hrl { border-top:2.5px solid #1d7a4a; }
+  .vblank { background:#fdeaea; color:#e06060; border-radius:8px; padding:0 12px; font-weight:bold; }
+  .pattern { font-family:Menlo,Consolas,monospace; white-space:pre; text-align:center; font-size:17px; color:#185a9d; line-height:1.9; background:#f6fbf7; border-radius:14px; padding:14px 18px; margin:10px 0; overflow-x:auto; }
   .card-btn { background:linear-gradient(135deg,#3b8b5b,#1d7a4a); width:100%; }
   table.kb { width:100%; border-collapse:collapse; font-size:14px; }
   table.kb th, table.kb td { border:1px solid #dcefe2; padding:7px 8px; text-align:center; }
@@ -69,7 +78,7 @@
 <div class="container">
   <button id="sound-toggle" onclick="toggleSound()" title="音效开关">🔊</button>
   <h1>🔢 大数探险家</h1>
-  <div class="subtitle">北师大版 · 数学四年级上册 · 第一单元《认识更大的数》 · 玩中学 · v1.0</div>
+  <div class="subtitle">北师大版 · 数学四年级上册 · 第1单元《认识更大的数》＋ 第3单元《乘法》 · 玩中学</div>
 
   <!-- ============ 首页 ============ -->
   <div id="home">
@@ -83,6 +92,9 @@
         <button class="level-btn l6" onclick="startGame(6)"><span class="icon">🔄</span>改写vs近似<span class="desc">易错！= 和 ≈ 别用错</span></button>
         <button class="level-btn l7" onclick="startGame(7)"><span class="icon">🧠</span>概念快问快答<span class="desc">计数单位、自然数、进率</span></button>
         <button class="level-btn l8" onclick="startGame(8)"><span class="icon">📝</span>常见题<span class="desc">数的组成、最大最小数、组卡片、读零</span></button>
+        <button class="level-btn l9" onclick="startGame(9)"><span class="icon">🚀</span>竖式乘法<span class="desc">三位数×两位数，竖式填空</span></button>
+        <button class="level-btn l10" onclick="startGame(10)"><span class="icon">👀</span>估算能手<span class="desc">大数估算，估大还是估小</span></button>
+        <button class="level-btn l11" onclick="startGame(11)"><span class="icon">🧩</span>有趣的算式<span class="desc">找规律：回文数、乘9积、缺8数</span></button>
       </div>
       <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">数位顺序表 + 读数口诀 + 四舍五入</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
@@ -105,6 +117,12 @@
         ⚖️ <b>比大小：</b>①先比位数，位数多的大；②位数相同，从最高位一位一位往下比。<br>
         ✂️ <b>四舍五入：</b>保留到万位，看<b>千位</b>；保留到亿位，看<b>千万位</b>。下一位 <b>≥5 就进 1（五入），&lt;5 就舍去（四舍）</b>，后面都写成 0。<br>
         🔄 <b>改写 vs 近似数（易错！）：</b>改写（整万、整亿）只是换了单位，<b>大小不变，用 = </b>；四舍五入得到的近似数<b>大小变了，用 ≈</b>。
+      </div>
+      <div class="tip">
+        ✖️ <b>竖式乘法（三位数×两位数）：</b>①数位对齐，从个位乘起；②先用<b>个位</b>去乘，积的末位对齐<b>个位</b>；再用<b>十位</b>去乘，积的末位对齐<b>十位</b>（错一位，最容易错！）；③把两部分积加起来。<br>
+        ⭕ <b>末尾有 0 的简便写法：</b>先把 0 前面的数相乘，因数末尾一共几个 0，就在积的末尾添几个 0。如 120×40：先算 12×4=48，再添 2 个 0 → 4800。<br>
+        🎯 <b>估算：</b>把大数看成整十、整百数再乘。<b>看大了估出来偏大，看小了偏小</b>；题目问"大约"才估算，问"等于"要精算。<br>
+        🧩 <b>有趣的算式：</b>111111×111111=12345654321（回文数）；99999×99999=9999800001；缺 8 数 12345679×9=111111111。
       </div>
       <button class="big-btn" onclick="showHome()">我知道啦，去闯关！🚀</button>
     </div>
@@ -268,6 +286,60 @@
     </div>
   </div>
 
+  <!-- ============ 游戏 9：竖式乘法 ============ -->
+  <div id="game9" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g9-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g9-score">0</span></span>
+        <span class="badge hidden" id="g9-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g9-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g9-question"></p>
+      <div id="g9-vs"></div>
+      <div class="options" id="g9-options"></div>
+      <div class="feedback" id="g9-fb"></div>
+      <button class="big-btn hidden" id="g9-next" onclick="g9Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ============ 游戏 10：估算能手 ============ -->
+  <div id="game10" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g10-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g10-score">0</span></span>
+        <span class="badge hidden" id="g10-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g10-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g10-question"></p>
+      <div class="bignum hidden" id="g10-num"></div>
+      <div class="options" id="g10-options"></div>
+      <div class="feedback" id="g10-fb"></div>
+      <button class="big-btn hidden" id="g10-next" onclick="g10Next()">下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ============ 游戏 11：有趣的算式 ============ -->
+  <div id="game11" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g11-q">1</span>/10 题</span>
+        <span class="badge">⭐ 得分：<span id="g11-score">0</span></span>
+        <span class="badge hidden" id="g11-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g11-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:4px" id="g11-question"></p>
+      <div class="pattern hidden" id="g11-num"></div>
+      <div class="options" id="g11-options"></div>
+      <div class="feedback" id="g11-fb"></div>
+      <button class="big-btn hidden" id="g11-next" onclick="g11Next()">下一题 →</button>
+    </div>
+  </div>
+
   <!-- ============ 错题本 ============ -->
   <div id="wrongbook" class="hidden">
     <div class="card">
@@ -298,14 +370,14 @@
 <script>
 /* ================= 通用 ================= */
 const $ = id => document.getElementById(id);
-const screens = ['home','knowledge','game1','game2','game3','game4','game5','game6','game7','game8','wrongbook','result'];
+const screens = ['home','knowledge','game1','game2','game3','game4','game5','game6','game7','game8','game9','game10','game11','wrongbook','result'];
 function showScreen(name){ screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
 function showHome(){ showScreen('home'); }
 function showKnowledge(){ showScreen('knowledge'); }
 let fromWrong=false;
 function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
 function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
-function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init,g5Init,g6Init,g7Init,g8Init][n-1](); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init,g5Init,g6Init,g7Init,g8Init,g9Init,g10Init,g11Init][n-1](); }
 
 /* ================= 趣味元素：音效 / 飘字 / 撒花 / 连对 ================= */
 let soundOn = true;
@@ -874,6 +946,177 @@ function g8Answer(btn){
 }
 function g8Next(){ if(g8.q>=g8.total){ finishCommon('常见题',g8,'这些都是卷子上最常见的题：数的组成、最大最小数、卡片组数、读零、近似数逆推。'); } else g8Ask(); }
 
+/* ================= 游戏 9：竖式乘法 ================= */
+let g9 = {};
+function g9Init(){ g9={q:0,score:0,total:10,streak:0}; g9Ask(); }
+function g9Ask(){
+  g9.q++;
+  $('g9-q').textContent=g9.q; $('g9-score').textContent=g9.score;
+  $('g9-bar').style.width=((g9.q-1)/g9.total*100)+'%';
+  $('g9-fb').textContent=''; $('g9-fb').className='feedback'; $('g9-next').classList.add('hidden');
+  let question, correct, pool, explain, vsHtml='', recordTitle='';
+  const zeroMode=Math.random()<0.22;
+  if(zeroMode){
+    let a=100+Math.floor(Math.random()*880);
+    a=Math.round(a/10)*10; if(a>990)a=990;           // a 末尾是 0
+    const b=(10+Math.floor(Math.random()*9))*10;      // b 是整十数
+    const p=(a/10)*(b/10);
+    correct=String(p*100);
+    question=`末尾有 0 的简便写法：${a} × ${b}，先算 ${a/10} × ${b/10} = ${p}，再在积的末尾添 0。结果是？`;
+    pool=[String(p*10),String(p*1000),String(p*100+100)];
+    explain=`两个因数末尾一共 2 个 0：先算 ${a/10}×${b/10}=${p}，再在末尾添 2 个 0，得 ${correct}。`;
+    recordTitle=`简便写法：${a} × ${b}`;
+  } else {
+    let a=100+Math.floor(Math.random()*900), b=10+Math.floor(Math.random()*90);
+    while(b%10===0) b=10+Math.floor(Math.random()*90);
+    const ones=b%10, tens=(b-ones)/10;
+    const p1=a*ones, p2=a*tens, total=a*b;
+    const which=Math.floor(Math.random()*3);
+    const BL='<span class="vblank">？</span>';
+    const d=s=>String(s).split('').join(' ');
+    const W=String(total).length;
+    const padL=s=>'&nbsp;'.repeat(Math.max(0,W-String(s).length));
+    vsHtml=`<table class="vst">
+<tr><td class="op"></td><td>${padL(a)+d(a)}</td></tr>
+<tr><td class="op">×</td><td>${padL(b)+d(b)}</td></tr>
+<tr><td class="op"></td><td class="hrl">${which===0?BL:padL(p1)+d(p1)}</td></tr>
+<tr><td class="op"></td><td style="padding-right:1.6em">${which===1?BL:padL(p2,W-1)+d(p2)}</td></tr>
+<tr><td class="op"></td><td class="hrl">${which===2?BL:padL(total)+d(total)}</td></tr>
+</table>`;
+    const stepName=['第一部分积（用个位乘）','第二部分积（用十位乘，注意错位）','最后的得数'][which];
+    question=`${a} × ${b} 的竖式，"？"处应该填多少？`;
+    recordTitle=`竖式填空：${a} × ${b}（${stepName}）`;
+    if(which===0){ correct=String(p1); pool=[String(p2),String(p1+10),String(p1-10),String(a*(ones+1))];
+      explain=`用个位 ${ones} 去乘 ${a}：${a}×${ones}=${p1}，这一步的积末位要和<b>个位</b>对齐。`; }
+    else if(which===1){ correct=String(p2); pool=[String(p2*10),String(p1),String(p2-10),String(p2+100)];
+      explain=`用十位 ${tens} 去乘 ${a}：${a}×${tens}=${p2}，它表示 ${a}×${tens} 个十，所以积的末位要和<b>十位</b>对齐（向左错一位）。易错：别把 ${p2*10} 直接写上去就完事，竖式里写 ${p2}，位已经错开了。`; }
+    else { correct=String(total); pool=[String(p1+p2),String(a*(b+1)),String(a*ones*10+p2),String(total+100)];
+      explain=`把两部分积<b>错位相加</b>：${p1} + ${p2}0 = ${total}。易错：第二部分积末位对齐十位再相加，不是直接 ${p1+p2}。`; }
+  }
+  g9.correct=correct; g9.explain=explain; g9.recordTitle=recordTitle||`竖式填空：${a} × ${b}`;
+  $('g9-question').textContent=question;
+  $('g9-vs').innerHTML=vsHtml;
+  const opts=mkOpts(correct,pool);
+  $('g9-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g9Answer(this)">${o}</button>`).join('');
+}
+function g9Answer(btn){
+  const ok=btn.dataset.ok==='1';
+  markResult(g9.correct,[...$('g9-options').querySelectorAll('.opt-btn')],btn,$('g9-fb'),g9.explain);
+  if(ok){ g9.score+=10; g9.streak=(g9.streak||0)+1; setStreak('g9',g9.streak); beep('ok'); popScore('+10 ⭐'); }
+  else{ g9.streak=0; setStreak('g9',0); beep('no'); recordWrong({game:'竖式', title:g9.recordTitle, svg:'', user:btn.textContent, correct:g9.correct, explain:g9.explain.replace(/<[^>]+>/g,'')}); }
+  $('g9-score').textContent=g9.score;
+  $('g9-next').classList.remove('hidden');
+  $('g9-next').textContent = g9.q>=g9.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g9Next(){ if(g9.q>=g9.total){ finishCommon('竖式乘法',g9,'竖式乘法：数位对齐，用个位、十位分别去乘，十位乘完的积末位对齐十位；末尾有 0 先去 0 再添 0。'); } else g9Ask(); }
+
+/* ================= 游戏 10：估算能手 ================= */
+let g10 = {};
+function g10Init(){ g10={q:0,score:0,total:10,streak:0}; g10Ask(); }
+function g10Ask(){
+  g10.q++;
+  $('g10-q').textContent=g10.q; $('g10-score').textContent=g10.score;
+  $('g10-bar').style.width=((g10.q-1)/g10.total*100)+'%';
+  $('g10-fb').textContent=''; $('g10-fb').className='feedback'; $('g10-next').classList.add('hidden');
+  let question, correct, pool, explain, num='';
+  if(Math.random()<0.55){
+    let a=100+Math.floor(Math.random()*400), b=11+Math.floor(Math.random()*88);
+    while(a%100===0) a=100+Math.floor(Math.random()*400);
+    while(b%10===0) b=11+Math.floor(Math.random()*88);
+    const ra=Math.round(a/100)*100, rb=Math.round(b/10)*10;
+    const est=ra*rb;
+    num=`${a} × ${b}`;
+    question=`估算：把两个数看成整百数、整十数再乘，结果大约是多少？`;
+    correct=String(est);
+    pool=[String(a*rb),String(ra*b),String(a*b),String(est+rb)];
+    explain=`估算三步：${a}≈${ra}，${b}≈${rb}，再乘：${ra}×${rb}=${est}。所以 ${a}×${b}≈${est}。`;
+  } else {
+    let a=100+Math.floor(Math.random()*400);
+    while(a%100===0) a=100+Math.floor(Math.random()*400);
+    const ra=Math.round(a/100)*100;
+    const big=ra>a;
+    correct=big?'大':'小';
+    pool=['大','小','不变','不确定'];
+    num=`${a} × 21`;
+    question=`估算时把 ${a} 看成 ${ra}，估算结果比精确结果大还是小？`;
+    explain=`${a} 被看成 ${ra}，数变${big?'大':'小'}了，另一个乘数不变，乘出来的结果也就比精确结果${big?'大':'小'}。口诀：<b>看大了估大，看小了估小</b>。`;
+  }
+  g10.correct=correct; g10.explain=explain;
+  $('g10-question').textContent=question;
+  $('g10-num').textContent=num; $('g10-num').classList.toggle('hidden',!num);
+  const opts=mkOpts(correct,pool);
+  $('g10-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g10Answer(this)">${o}</button>`).join('');
+}
+function g10Answer(btn){
+  const ok=btn.dataset.ok==='1';
+  markResult(g10.correct,[...$('g10-options').querySelectorAll('.opt-btn')],btn,$('g10-fb'),g10.explain);
+  if(ok){ g10.score+=10; g10.streak=(g10.streak||0)+1; setStreak('g10',g10.streak); beep('ok'); popScore('+10 ⭐'); }
+  else{ g10.streak=0; setStreak('g10',0); beep('no'); recordWrong({game:'估算', title:'估算：'+$('g10-num').textContent, svg:'', user:btn.textContent, correct:g10.correct, explain:g10.explain.replace(/<[^>]+>/g,'')}); }
+  $('g10-score').textContent=g10.score;
+  $('g10-next').classList.remove('hidden');
+  $('g10-next').textContent = g10.q>=g10.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g10Next(){ if(g10.q>=g10.total){ finishCommon('估算能手',g10,'估算：先看成整十、整百数再乘；看大了估大，看小了估小；问"大约"才估算。'); } else g10Ask(); }
+
+/* ================= 游戏 11：有趣的算式 ================= */
+let g11 = {};
+function g11Init(){ g11={q:0,score:0,total:10,streak:0}; g11Ask(); }
+const ascDesc=n=>{ let s=''; for(let i=1;i<=n;i++)s+=i; for(let i=n-1;i>=1;i--)s+=i; return s; };
+function g11Ask(){
+  g11.q++;
+  $('g11-q').textContent=g11.q; $('g11-score').textContent=g11.score;
+  $('g11-bar').style.width=((g11.q-1)/g11.total*100)+'%';
+  $('g11-fb').textContent=''; $('g11-fb').className='feedback'; $('g11-next').classList.add('hidden');
+  let question, correct, pool, explain, num='';
+  const kind=Math.floor(Math.random()*4);
+  if(kind===0){
+    const k=3+Math.floor(Math.random()*6); // 3~8
+    const op='12345678'.slice(0,k), plus=k+1;
+    correct='1'.repeat(k+1);
+    num=`1×9+2=11\n12×9+3=111\n123×9+4=1111\n……\n${op}×9+${plus}=？`;
+    question=`找规律："？"处应该等于多少？`;
+    pool=['1'.repeat(k),'1'.repeat(k+2),'9'.repeat(k)];
+    explain=`规律：从 1 排到 ${k} 的数，乘 9 再加 ${plus}，结果就是 ${k+1} 个 1。所以 ${op}×9+${plus}=${correct}。`;
+  } else if(kind===1){
+    const n=3+Math.floor(Math.random()*3); // 3~5
+    const op='9'.repeat(n);
+    correct=(BigInt(op)*BigInt(op)).toString();
+    num=`9×9=81\n99×99=9801\n999×999=998001\n……\n${op}×${op}=？`;
+    question=`找规律："？"处应该等于多少？`;
+    pool=[(BigInt('9'.repeat(n-1))*BigInt('9'.repeat(n-1))).toString(),(BigInt('9'.repeat(n+1))*BigInt('9'.repeat(n+1))).toString(),'9'.repeat(n)+'0'.repeat(n)+'1'];
+    explain=`规律：${n} 个 9 相乘，结果是 ${n-1} 个 9、一个 8、${n-1} 个 0、一个 1。所以 ${op}×${op}=${correct}。`;
+  } else if(kind===2){
+    const n=4+Math.floor(Math.random()*3); // 4~7
+    const op='1'.repeat(n);
+    correct=(BigInt(op)*BigInt(op)).toString();
+    num=`11×11=121\n111×111=12321\n1111×1111=1234321\n……\n${op}×${op}=？`;
+    question=`找规律："？"处应该等于多少？`;
+    pool=[(BigInt('1'.repeat(n-1))*BigInt('1'.repeat(n-1))).toString(),(BigInt('1'.repeat(n+1))*BigInt('1'.repeat(n+1))).toString(),'1'.repeat(2*n-1)];
+    explain=`规律：${n} 个 1 相乘，结果从 1 顺数到 ${n} 再倒着排回来（回文数）。所以 ${op}×${op}=${correct}。`;
+  } else {
+    correct='111111111';
+    num=`12345679 × 9 = ？`;
+    question=`神奇的缺 8 数：12345679（里面没有 8！）乘 9 等于多少？`;
+    pool=['1111111101','11111111','1111111110','12345679'];
+    explain=`12345679×9=111111111，九个 1 整整齐齐。这个缺少 8 的数叫"缺 8 数"。`;
+  }
+  g11.correct=correct; g11.explain=explain;
+  $('g11-question').textContent=question;
+  $('g11-num').textContent=num; $('g11-num').classList.toggle('hidden',!num);
+  const opts=mkOpts(correct,pool);
+  $('g11-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g11Answer(this)">${o}</button>`).join('');
+}
+function g11Answer(btn){
+  const ok=btn.dataset.ok==='1';
+  markResult(g11.correct,[...$('g11-options').querySelectorAll('.opt-btn')],btn,$('g11-fb'),g11.explain);
+  if(ok){ g11.score+=10; g11.streak=(g11.streak||0)+1; setStreak('g11',g11.streak); beep('ok'); popScore('+10 ⭐'); }
+  else{ g11.streak=0; setStreak('g11',0); beep('no'); recordWrong({game:'规律', title:$('g11-question').textContent+'（'+$('g11-num').textContent.split('\n').pop()+'）', svg:'', user:btn.textContent, correct:g11.correct, explain:g11.explain.replace(/<[^>]+>/g,'')}); }
+  $('g11-score').textContent=g11.score;
+  $('g11-next').classList.remove('hidden');
+  $('g11-next').textContent = g11.q>=g11.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g11Next(){ if(g11.q>=g11.total){ finishCommon('有趣的算式',g11,'数字规律题：先算出前几行，找到"变多、变长、对称"的规律，再套到下一行。'); } else g11Ask(); }
+
 /* ================= 通用结算 ================= */
 function finishCommon(name,g,detail){
   const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
@@ -941,7 +1184,7 @@ function applyAnsState(){
   const list=$('wrong-list');
   if(list) list.classList.toggle('hide-ans',hideAns);
 }
-const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8};
+const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8,'竖式':9,'估算':10,'规律':11};
 function redoWrong(label){
   const n=GAME_NO[label];
   if(n){ startGame(n); fromWrong=true; }

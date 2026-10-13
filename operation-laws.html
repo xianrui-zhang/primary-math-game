@@ -807,14 +807,6 @@ async function clearWrongAll(){
   await dbClear(); renderWrongList(); updateWrongCount();
 }
 updateWrongCount();
-
-/* ================= 选项打标与批改 ================= */
-function markAll(listId,btn,ok){
-  const allBtns=$(listId).querySelectorAll('.opt-btn');
-  allBtns.forEach(b=>b.disabled=true);
-  if(ok) btn.classList.add('correct');
-  else{ btn.classList.add('wrong'); allBtns.forEach(b=>{ if(String(b.dataset.v)===String(gCorrect)) b.classList.add('correct'); }); }
-}
 </script>
 </body>
 </html>

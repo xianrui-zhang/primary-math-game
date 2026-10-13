@@ -24,6 +24,24 @@
   .l6 { background:linear-gradient(135deg,#11998e,#38ef7d); }
   .l7 { background:linear-gradient(135deg,#8e2de2,#4a00e0); }
   .l8 { background:linear-gradient(135deg,#0ba360,#3cba92); }
+  .l9 { background:linear-gradient(135deg,#f6d365,#fda085); }
+  /* ---- 青蛙跳数轴 ---- */
+  .nl-wrap { position:relative; margin:20px 0 8px; padding-top:48px; }
+  .frog { position:absolute; top:0; left:0; width:40px; margin-left:-20px; text-align:center; z-index:2; transition:left .55s cubic-bezier(.35,.8,.4,1); }
+  .frog-inner { display:inline-block; font-size:32px; animation:frogIdle 1.8s ease-in-out infinite; transform-origin:50% 100%; }
+  @keyframes frogIdle { 0%,100%{ transform:translateY(0) scale(1,1); } 12%{ transform:translateY(-8px) scale(1.04,.94); } 24%{ transform:translateY(0) scale(.96,1.04); } 30%{ transform:translateY(0) scale(1,1); } }
+  .frog.jumping .frog-inner { animation:none; }
+  .frog-inner.nope { animation:nopeShake .45s ease; }
+  @keyframes nopeShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px) rotate(-10deg)} 75%{transform:translateX(7px) rotate(10deg)} }
+  .nl-line { display:flex; align-items:flex-start; border-top:3px solid #185a9d; }
+  .nl-tile { flex:1; background:none; border:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; -webkit-tap-highlight-color:transparent; }
+  .nl-tile .tick { width:3px; height:12px; background:#185a9d; }
+  .nl-tile .chip { margin:9px 2px 0; background:linear-gradient(135deg,#7b8cf0,#5a6ae0); color:#fff; font-size:12px; font-weight:bold; border-radius:8px; padding:6px 5px; min-width:44px; text-align:center; transition:transform .15s; white-space:nowrap; }
+  .nl-tile:hover .chip { transform:scale(1.12); }
+  .nl-tile.correct .chip { background:linear-gradient(135deg,#34d399,#059669); transform:scale(1.12); }
+  .nl-tile.shake .chip { animation:chipShake .4s; background:#fdeaea; color:#b83232; }
+  @keyframes chipShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+  .nl-tile.dim { opacity:.45; cursor:default; }
   .card-btn { background:linear-gradient(135deg,#3b8b5b,#1d7a4a); width:100%; }
   table.kb { width:100%; border-collapse:collapse; font-size:14px; }
   table.kb th, table.kb td { border:1px solid #dcefe2; padding:7px 8px; text-align:center; }
@@ -84,6 +102,7 @@
         <button class="level-btn l6" onclick="startGame(6)"><span class="icon">🔄</span>改写vs近似<span class="desc">易错！= 和 ≈ 别用错</span></button>
         <button class="level-btn l7" onclick="startGame(7)"><span class="icon">🧠</span>概念快问快答<span class="desc">计数单位、自然数、进率</span></button>
         <button class="level-btn l8" onclick="startGame(8)"><span class="icon">📝</span>常见题<span class="desc">数的组成、最大最小数、组卡片、读零</span></button>
+        <button class="level-btn l9" onclick="startGame(9)"><span class="icon">🐸</span>青蛙挑战<span class="desc">读数 · 近似数 · 比大小，点对青蛙就跳！</span></button>
       </div>
       <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">数位顺序表 + 读数口诀 + 四舍五入</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
@@ -269,6 +288,27 @@
     </div>
   </div>
 
+  <!-- ============ 游戏 9：青蛙跳数轴 ============ -->
+  <div id="game9" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g9-q">1</span>/8 题</span>
+        <span class="badge">⭐ 得分：<span id="g9-score">0</span></span>
+        <span class="badge hidden" id="g9-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g9-bar"></div></div>
+      <p style="text-align:center;font-size:16px;margin-bottom:0" id="g9-question"></p>
+      <div class="bignum" id="g9-num" style="margin:8px 0 2px"></div>
+      <div class="nl-wrap" id="g9-wrap">
+        <div class="frog" id="g9-frog"><span class="frog-inner" id="g9-frog-inner">🐸</span></div>
+        <div class="nl-line" id="g9-line"></div>
+      </div>
+      <div class="feedback" id="g9-fb"></div>
+      <button class="big-btn hidden" id="g9-next" onclick="g9Next()">下一题 →</button>
+    </div>
+  </div>
+
   <!-- ============ 错题本 ============ -->
   <div id="wrongbook" class="hidden">
     <div class="card">
@@ -299,14 +339,14 @@
 <script>
 /* ================= 通用 ================= */
 const $ = id => document.getElementById(id);
-const screens = ['home','knowledge','game1','game2','game3','game4','game5','game6','game7','game8','wrongbook','result'];
+const screens = ['home','knowledge','game1','game2','game3','game4','game5','game6','game7','game8','game9','wrongbook','result'];
 function showScreen(name){ screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
 function showHome(){ showScreen('home'); }
 function showKnowledge(){ showScreen('knowledge'); }
 let fromWrong=false;
 function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
 function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
-function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init,g5Init,g6Init,g7Init,g8Init][n-1](); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init,g5Init,g6Init,g7Init,g8Init,g9Init][n-1](); }
 
 /* ================= 趣味元素：音效 / 飘字 / 撒花 / 连对 ================= */
 let soundOn = true;
@@ -875,6 +915,174 @@ function g8Answer(btn){
 }
 function g8Next(){ if(g8.q>=g8.total){ finishCommon('常见题',g8,'这些都是卷子上最常见的题：数的组成、最大最小数、卡片组数、读零、近似数逆推。'); } else g8Ask(); }
 
+/* ================= 游戏 9：青蛙跳数轴 ================= */
+let g9 = {};
+/* 芯片标签：每 4 位一组显示（符合分级习惯） */
+function chipLabel(n){ return String(n).replace(/\B(?=(\d{4})+(?!\d))/g,' '); }
+function g9Init(){ g9={q:0,score:0,total:8,streak:0}; g9Ask(); }
+/* 随机 len 位数（首位非 0）；forceMidZero 时中间位更容易出现 0，方便出读数陷阱 */
+function g9BigNum(len,forceMidZero){
+  let s=String(1+Math.floor(Math.random()*9));
+  for(let i=1;i<len;i++){
+    let x=Math.floor(Math.random()*10);
+    if(forceMidZero && Math.random()<0.45) x=Math.floor(Math.random()*10)<6?0:x;
+    s+=String(x);
+  }
+  return Number(s);
+}
+function g9FrogLeft(idx){
+  const wrap=$('g9-wrap'), line=$('g9-line');
+  if(!line.children||!line.children[idx]) return 0;
+  const wr=wrap.getBoundingClientRect(), tr=line.children[idx].getBoundingClientRect();
+  return tr.left+tr.width/2-wr.left;
+}
+function g9PlaceFrog(idx,animate){
+  g9.frogIdx=idx;
+  const f=$('g9-frog'), inner=$('g9-frog-inner');
+  const target=g9FrogLeft(idx);
+  if(!animate){
+    f.style.transition='none';
+    f.style.left=target+'px';
+    void f.offsetWidth; f.style.transition='';
+    return;
+  }
+  if(g9.jumping) return;                    // 跳跃中防连点
+  g9.jumping=true;
+  f.classList.add('jumping');               // 关掉原地呼吸动画
+  const from=parseFloat(f.style.left)||0;
+  const dist=Math.abs(target-from);
+  const dur=Math.min(900,380+dist*0.55);    // 距离越远，跳的时长越长
+  const hopH=Math.min(72,34+dist*0.09);     // 距离越远，跳得越高
+  const dir=(target>from)?1:-1;
+  const t0=performance.now();
+  function frame(now){
+    const t=Math.min(1,(now-t0)/dur);
+    const ease=t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;      // 起跳加速、落地减速
+    f.style.left=(from+(target-from)*ease)+'px';
+    const arc=Math.sin(t*Math.PI);                           // 抛物线高度
+    inner.style.transform=`translateY(${-arc*hopH}px) rotate(${dir*arc*9}deg) scale(${1+arc*0.10},${1-arc*0.08})`;
+    if(t<1){ requestAnimationFrame(frame); }
+    else{
+      inner.style.transform='translateY(0) scale(1.18,.80)'; // 落地压扁
+      setTimeout(()=>{ inner.style.transform=''; f.classList.remove('jumping'); g9.jumping=false; },150);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+window.addEventListener('resize',()=>{ if(!$('game9').classList.contains('hidden')&&g9.opts) g9PlaceFrog(g9.frogIdx,false); });
+function g9Ask(){
+  g9.q++; g9.locked=false; g9.tried=false;
+  $('g9-q').textContent=g9.q; $('g9-score').textContent=g9.score;
+  $('g9-bar').style.width=((g9.q-1)/g9.total*100)+'%';
+  $('g9-fb').textContent=''; $('g9-fb').className='feedback'; $('g9-next').classList.add('hidden');
+  const mode=Math.floor(Math.random()*3);   // 0 读数 / 1 近似数 / 2 比大小
+  g9.mode=mode;
+  let question, big, correct, explain, recordTitle;
+  if(mode===0){
+    // 读数：给读法选数，陷阱全是"0"的位置
+    const n=g9BigNum(7+Math.floor(Math.random()*2), true);
+    correct=n;
+    const reading=numToReading(String(n));
+    const s=String(n), traps=[];
+    for(let i=1;i<s.length-1;i++) if(s[i]==='0') traps.push(Number(s.slice(0,i)+s.slice(i+1)));  // 去掉中间的 0
+    for(let i=1;i<s.length;i++) traps.push(Number(s.slice(0,i)+'0'+s.slice(i)));                 // 中间插 0
+    for(let i=1;i<s.length-1;i++){ const a=s.split(''); [a[i],a[i+1]]=[a[i+1],a[i]]; traps.push(Number(a.join(''))); } // 相邻交换
+    for(let i=1;i<s.length;i++) for(const d of [1,2,3,9]){ if(s[i]!=='0'){ const a=s.split(''); a[i]=String((Number(a[i])+d)%10); traps.push(Number(a.join(''))); } }
+    shuffleArr(traps);
+    const opts=[n], seen=new Set([n]);
+    for(const t of traps){
+      if(opts.length>=6)break;
+      if(t<=0||seen.has(t))continue;
+      const r=numToReading(String(t));
+      if(r===reading)continue;
+      if([...seen].some(x=>numToReading(String(x))===r))continue;
+      opts.push(t); seen.add(t);
+    }
+    let pad=1;
+    while(opts.length<6){ const t=n+pad*1000; pad++; if(numToReading(String(t))!==reading&&!seen.has(t)){opts.push(t);seen.add(t);} }
+    question='哪个数的读法和下面一致？点对格子，青蛙就跳过去！';
+    big=`「${reading}」`;
+    explain=`${chipLabel(n)} 读作「${reading}」。记住："0"的读法——每级末尾的 0 不读，中间不管有几个连续的 0 都只读一个"零"。`;
+    recordTitle=`读数：读作「${reading}」的是哪个数`;
+    g9.opts=shuffleArr(opts);
+  }else if(mode===1){
+    // 近似数：哪个数四舍五入到万位约是 k 万
+    const k=100+Math.floor(Math.random()*900);           // 100~999 万（7 位数）
+    const tail=Math.floor(Math.random()*5000);           // 0~4999，舍去
+    correct=k*10000+tail;
+    const traps=[(k+1)*10000+1+Math.floor(Math.random()*4998), k*10000+5000+Math.floor(Math.random()*4999), (k-1)*10000+Math.floor(Math.random()*4999), (k+2)*10000+Math.floor(Math.random()*4000), Math.max(1,k*10000-5000-Math.floor(Math.random()*4999))];
+    const opts=[correct], seen=new Set([correct]);
+    for(const t of traps){ if(opts.length>=6)break; if(!seen.has(t)){opts.push(t);seen.add(t);} }
+    while(opts.length<6){ const t=correct+opts.length*10000+777; if(!seen.has(t)){opts.push(t);seen.add(t);} }
+    question='青蛙要跳到"约 '+k+' 万"的那个数上，是哪个？（四舍五入到万位）';
+    big=`四舍五入到万位 ≈ ${k} 万`;
+    const q=Math.floor(correct/10000), tl=correct%10000;
+    explain=`${chipLabel(correct)} 的万位是 ${q}，后面的尾数 ${tl} ${tl>=5000?'≥5000，要向前一位进 1':'< 5000，直接舍去'}，所以它 ≈ ${tl>=5000?q+1:q} 万。`;
+    recordTitle=`近似数：约 ${k} 万的是哪个数`;
+    g9.opts=shuffleArr(opts);
+  }else{
+    // 比大小：6 个同位数的大数，找最大 / 最小
+    const findMax=Math.random()<0.5;
+    const opts=[]; const seen=new Set();
+    while(opts.length<6){ const v=1000000+Math.floor(Math.random()*9000000); if(!seen.has(v)){opts.push(v);seen.add(v);} }
+    correct=findMax?Math.max(...opts):Math.min(...opts);
+    question=`下面 6 个数中，${findMax?'最大':'最小'}的是哪个？`;
+    big='位数相同，从最高位比起！';
+    explain=`这 6 个数都是 7 位数：先比最高位（百万位），最高位相同再比下一位，一路比到分出大小为止。${findMax?'最大':'最小'}的是 ${chipLabel(correct)}，读作「${numToReading(String(correct))}」。`;
+    recordTitle=`比大小：${findMax?'最大':'最小'}的是哪个`;
+    g9.opts=shuffleArr(opts);
+  }
+  g9.correct=correct; g9.explain=explain; g9.recordTitle=recordTitle;
+  $('g9-question').textContent=question;
+  $('g9-num').innerHTML=big;
+  $('g9-line').innerHTML=g9.opts.map((v,i)=>
+    `<button class="nl-tile" data-i="${i}" onclick="g9Hop(${i})"><span class="tick"></span><span class="chip">${chipLabel(v)}</span></button>`
+  ).join('');
+  requestAnimationFrame(()=>g9PlaceFrog(0,false));
+}
+function g9Hop(idx){
+  if(g9.locked) return;
+  const tile=$('g9-line').children[idx];
+  const v=g9.opts[idx];
+  if(v===g9.correct){
+    g9.locked=true;
+    tile.classList.add('correct');
+    [...$('g9-line').children].forEach(b=>{ b.disabled=true; if(b!==tile) b.classList.add('dim'); });
+    g9PlaceFrog(idx,true);
+    const first=!g9.tried;
+    if(first){ g9.score+=10; g9.streak=(g9.streak||0)+1; }
+    else{ g9.score+=5; g9.streak=0; }
+    setStreak('g9',g9.streak);
+    beep('ok'); popScore(first?'+10 ⭐':'+5 ⭐');
+    $('g9-score').textContent=g9.score;
+    const fb=$('g9-fb');
+    fb.innerHTML=`🐸 呱！跳对啦！${g9.explain}${first?'':'（第一次跳错了，这次只得 5 分哦）'}`;
+    fb.className='feedback ok';
+    $('g9-next').classList.remove('hidden');
+    $('g9-next').textContent = g9.q>=g9.total ? '看看成绩 🏆' : '下一题 →';
+  }else{
+    tile.classList.add('shake');
+    setTimeout(()=>tile.classList.remove('shake'),450);
+    const inner=$('g9-frog-inner');
+    inner.classList.remove('nope'); void inner.offsetWidth; inner.classList.add('nope');
+    beep('no');
+    const fb=$('g9-fb');
+    const hint = g9.mode===0
+      ? '这个数的读法和题目不一样！再想想"0"什么时候读、什么时候不读～'
+      : (v<g9.correct ? '目标比它<b>大</b>，再往右边找找！' : '目标比它<b>小</b>，往回看看！');
+    fb.innerHTML=`🐸 呱呱！${hint}`;
+    fb.className='feedback no';
+    if(!g9.tried){
+      g9.tried=true;
+      recordWrong({game:'数轴', title:g9.recordTitle, svg:'', user:'跳到了 '+chipLabel(v), correct:chipLabel(g9.correct), explain:g9.explain.replace(/<[^>]+>/g,'')});
+    }
+  }
+}
+function g9Next(){
+  if(g9.q>=g9.total){ finishCommon('青蛙跳数轴',g9,'读数抓"0"：每级末尾不读，中间连续的 0 只读一个；四舍五入看尾数最高位，满 5 进 1 不满舍去；比大小先比位数，位数同从最高位比起。'); }
+  else g9Ask();
+}
+
 /* ================= 通用结算 ================= */
 function finishCommon(name,g,detail){
   const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
@@ -885,45 +1093,71 @@ function finishCommon(name,g,detail){
   showScreen('result');
 }
 
-/* ================= 错题本（IndexedDB） ================= */
-function openDB(){
-  return new Promise((res,rej)=>{
-    const req=indexedDB.open('BigNumberAdventureDB',1);
-    req.onupgradeneeded=e=>{ e.target.result.createObjectStore('wrong',{keyPath:'id',autoIncrement:true}); };
-    req.onsuccess=e=>res(e.target.result);
-    req.onerror=()=>rej(req.error);
+/* ================= 错题本存储（IndexedDB 优先，localStorage 兜底） ================= */
+const LS_KEY='BigNumberAdventureDBWrong';
+function lsAll(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
+function lsSave(arr){ try{ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }catch(e){} }
+let idbPromise=null;
+function getIdb(){
+  if(idbPromise!==null) return idbPromise;
+  idbPromise=new Promise((res,rej)=>{
+    try{
+      if(!window.indexedDB){ rej(new Error('环境不支持 IndexedDB')); return; }
+      const req=indexedDB.open('BigNumberAdventureDB',1);
+      req.onupgradeneeded=e=>{ e.target.result.createObjectStore('wrong',{keyPath:'id',autoIncrement:true}); };
+      req.onsuccess=e=>res(e.target.result);
+      req.onerror=()=>rej(req.error||new Error('IndexedDB 打开失败'));
+      req.onblocked=()=>rej(new Error('IndexedDB 被占用'));
+    }catch(e){ rej(e); }
   });
+  idbPromise.catch(()=>{ setTimeout(()=>{ idbPromise=null; },60000); });
+  return idbPromise;
 }
 async function dbAll(){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const req=db.transaction('wrong','readonly').objectStore('wrong').getAll();
-    req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);
-  });
+  try{
+    const db=await getIdb();
+    return await new Promise((res,rej)=>{
+      const req=db.transaction('wrong','readonly').objectStore('wrong').getAll();
+      req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);
+    });
+  }catch(e){ return lsAll(); }
 }
 async function dbAdd(entry){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction('wrong','readwrite');
-    tx.objectStore('wrong').add(entry);
-    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
-  });
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').add(entry);
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  const arr=lsAll(); let maxId=0; arr.forEach(x=>{ if(x.id>maxId)maxId=x.id; });
+  entry.id=maxId+1; arr.push(entry); lsSave(arr);
 }
 async function dbDel(id){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction('wrong','readwrite');
-    tx.objectStore('wrong').delete(id);
-    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
-  });
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').delete(id);
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  lsSave(lsAll().filter(x=>x.id!==id));
 }
 async function dbClear(){
-  const db=await openDB();
-  return new Promise((res,rej)=>{
-    const tx=db.transaction('wrong','readwrite');
-    tx.objectStore('wrong').clear();
-    tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
-  });
+  try{
+    const db=await getIdb();
+    await new Promise((res,rej)=>{
+      const tx=db.transaction('wrong','readwrite');
+      tx.objectStore('wrong').clear();
+      tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);
+    });
+    return;
+  }catch(e){}
+  lsSave([]);
 }
 function recordWrong(entry){
   dbAdd({...entry, time:Date.now()}).then(()=>updateWrongCount()).catch(e=>console.warn('错题保存失败',e));
@@ -942,7 +1176,7 @@ function applyAnsState(){
   const list=$('wrong-list');
   if(list) list.classList.toggle('hide-ans',hideAns);
 }
-const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8};
+const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8,'数轴':9};
 function redoWrong(label){
   const n=GAME_NO[label];
   if(n){ startGame(n); fromWrong=true; }

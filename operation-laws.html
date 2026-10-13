@@ -23,6 +23,19 @@
   .l5 { background:linear-gradient(135deg,#a78bfa,#7c3aed); }
   .l6 { background:linear-gradient(135deg,#fb7185,#e11d48); }
   .l7 { background:linear-gradient(135deg,#22d3ee,#0891b2); }
+  .l8 { background:linear-gradient(135deg,#fbbf24,#ef4444); }
+  .num-grid { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:14px 0 6px; }
+  .num-card { border:none; border-radius:16px; background:linear-gradient(135deg,#60a5fa,#2563eb); color:#fff; font-size:30px; font-weight:bold; width:76px; height:76px; cursor:pointer; transition:transform .15s, box-shadow .15s; box-shadow:0 4px 12px rgba(37,99,235,.30); }
+  .num-card:hover { transform:translateY(-4px); }
+  .num-card.picked { outline:4px solid #f7b733; transform:scale(1.10); background:linear-gradient(135deg,#fbbf24,#d97706); }
+  .num-card.final24 { background:linear-gradient(135deg,#34d399,#059669); outline:4px solid #f7b733; transform:scale(1.10); }
+  .op-row { display:flex; gap:12px; justify-content:center; margin:14px 0 6px; }
+  .op-btn { border:2px solid #ecd9fb; background:#fbf7ff; border-radius:12px; width:58px; height:58px; font-size:26px; font-weight:bold; color:#7c3aed; cursor:pointer; transition:all .15s; }
+  .op-btn:hover { border-color:#a78bfa; transform:scale(1.06); }
+  .op-btn.picked { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; border-color:#7c3aed; transform:scale(1.1); }
+  .hist { text-align:center; font-size:15px; color:#666; min-height:24px; margin:8px 0; line-height:1.8; }
+  .hist b { color:#5b21b6; background:#f5efff; border-radius:8px; padding:2px 8px; margin:0 2px; display:inline-block; }
+  .tool-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px; }
   .card-btn { background:linear-gradient(135deg,#7c3aed,#5b21b6); width:100%; }
   table.kb { width:100%; border-collapse:collapse; font-size:14px; }
   table.kb th, table.kb td { border:1px solid #f0e4fb; padding:7px 8px; text-align:center; }
@@ -64,7 +77,7 @@
 <div class="container">
   <button id="sound-toggle" onclick="toggleSound()" title="音效开关">🔊</button>
   <h1>🧙 运算律大冒险</h1>
-  <div class="subtitle">北师大版 · 数学四年级上册 · 第四单元《运算律》 · 玩中学 · v1.1</div>
+  <div class="subtitle">北师大版 · 数学四年级上册 · 第四单元《运算律》 · 玩中学 · v1.2</div>
 
   <!-- 首页 -->
   <div id="home">
@@ -77,6 +90,7 @@
         <button class="level-btn l5" onclick="startGame(5)"><span class="icon">🔍</span>分配律·反着用<span class="desc">提取公因数，期末必考</span></button>
         <button class="level-btn l6" onclick="startGame(6)"><span class="icon">🏃</span>简便计算闯关<span class="desc">凑整、拆数，怎么快怎么算</span></button>
         <button class="level-btn l7" onclick="startGame(7)"><span class="icon">🧙</span>运算律大法官<span class="desc">这些等式成立吗？</span></button>
+        <button class="level-btn l8" onclick="startGame(8)"><span class="icon">🃏</span>24点挑战<span class="desc">4 张牌自由组合凑 24，真动脑！</span></button>
       </div>
       <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">5大运算律 + 4条易错提醒</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
@@ -235,6 +249,30 @@
     </div>
   </div>
 
+  <!-- 游戏8 24点挑战 -->
+  <div id="game8" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g8-q">1</span>/6 题</span>
+        <span class="badge">⭐ 得分：<span id="g8-score">0</span></span>
+        <span class="badge hidden" id="g8-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g8-bar"></div></div>
+      <p style="text-align:center;font-size:16px">用 4 张牌和 <b>+ − × ÷</b> 算出 <span style="color:#db2777;font-size:22px">24</span>！<br><span style="font-size:13px;color:#999">玩法：点一个数 → 点一个运算符 → 再点一个数，两张牌就合并啦</span></p>
+      <div class="num-grid" id="g8-nums"></div>
+      <div class="op-row" id="g8-ops"></div>
+      <div class="hist" id="g8-hist"></div>
+      <div class="tool-row">
+        <button class="small-btn" onclick="g8Undo()">↩ 撤销一步</button>
+        <button class="small-btn" onclick="g8Reset()">🔄 重新开始本题</button>
+        <button class="small-btn" onclick="g8GiveUp()">👀 看答案</button>
+      </div>
+      <div class="feedback" id="g8-fb"></div>
+      <button class="big-btn hidden" id="g8-next" onclick="g8Next()">下一题 →</button>
+    </div>
+  </div>
+
   <!-- 错题本 -->
   <div id="wrongbook" class="hidden">
     <div class="card">
@@ -265,14 +303,14 @@
 <script>
 /* ================= 通用 ================= */
 const $ = id => document.getElementById(id);
-const screens = ['home','knowledge','game1','game2','game3','game4','game5','game6','game7','wrongbook','result'];
+const screens = ['home','knowledge','game1','game2','game3','game4','game5','game6','game7','game8','wrongbook','result'];
 function showScreen(name){ screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
 function showHome(){ showScreen('home'); }
 function showKnowledge(){ showScreen('knowledge'); }
 let fromWrong=false;
 function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
 function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
-function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init,g5Init,g6Init,g7Init][n-1](); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g1Init,g2Init,g3Init,g4Init,g5Init,g6Init,g7Init,g8Init][n-1](); }
 
 /* ================= 趣味元素 ================= */
 let soundOn = true;
@@ -703,6 +741,142 @@ function g7Answer(val,btn){
 }
 function g7Next(){ if(g7.q>=g7.total){ finishCommon('运算律大法官',g7,'最大陷阱：结合律 vs 分配律。只有乘换括号=结合律；乘法去喂加法=分配律。'); } else g7Ask(); }
 
+/* ================= 游戏8 24点挑战 ================= */
+let g8 = {};
+/* ---- 分数运算（避免小数误差） ---- */
+function fGcd(x,y){ return y?fGcd(y,x%y):Math.abs(x); }
+function fNorm(a){ let [n,d]=a; if(d<0){ n=-n; d=-d; } const g=fGcd(n,d)||1; return [n/g,d/g]; }
+function fAdd(a,b){ return fNorm([a[0]*b[1]+b[0]*a[1], a[1]*b[1]]); }
+function fSub(a,b){ return fNorm([a[0]*b[1]-b[0]*a[1], a[1]*b[1]]); }
+function fMul(a,b){ return fNorm([a[0]*b[0], a[1]*b[1]]); }
+function fDiv(a,b){ return fNorm([a[0]*b[1], a[1]*b[0]]); }
+function fIsInt(a){ return a[1]===1; }
+function fIs24(a){ return a[0]===24 && a[1]===1; }
+/* ---- 求解器：只找"中间结果都是整数、不做负数"的解法（适合四年级） ---- */
+function solve24(cards){
+  if(cards.length===1) return fIs24(cards[0].v) ? cards[0].e : null;
+  for(let i=0;i<cards.length;i++) for(let j=0;j<cards.length;j++){
+    if(i===j) continue;
+    const a=cards[i], b=cards[j];
+    const rest=cards.filter((_,k)=>k!==i&&k!==j);
+    const cands=[
+      [fAdd(a.v,b.v), `(${a.e} + ${b.e})`],
+      [fMul(a.v,b.v), `(${a.e} × ${b.e})`],
+      [fSub(a.v,b.v), `(${a.e} − ${b.e})`],
+    ];
+    if(b.v[0]!==0) cands.push([fDiv(a.v,b.v), `(${a.e} ÷ ${b.e})`]);
+    for(const [v,e] of cands){
+      if(!fIsInt(v) || v[0]<0) continue;
+      const r=solve24([...rest,{v,e}]);
+      if(r) return r;
+    }
+  }
+  return null;
+}
+/* ---- 出题：随机 4 张牌（1~13），保证有整数解法 ---- */
+function g8Gen(){
+  for(let t=0;t<800;t++){
+    const nums=Array.from({length:4},()=>1+Math.floor(Math.random()*13));
+    const sol=solve24(nums.map(n=>({v:[n,1],e:String(n)})));
+    if(sol) return {nums,sol};
+  }
+  return {nums:[1,2,3,4], sol:'1 × 2 × 3 × 4'}; // 兜底（几乎不会走到）
+}
+function g8Init(){ g8={q:0,score:0,total:6,streak:0}; g8Ask(); }
+function g8Ask(){
+  g8.q++;
+  $('g8-q').textContent=g8.q; $('g8-score').textContent=g8.score;
+  $('g8-bar').style.width=((g8.q-1)/g8.total*100)+'%';
+  $('g8-fb').textContent=''; $('g8-fb').className='feedback'; $('g8-next').classList.add('hidden');
+  const p=g8Gen();
+  g8.startNums=p.nums.slice(); g8.sol=p.sol;
+  g8.cur=p.nums.map(n=>({v:[n,1],e:String(n)}));
+  g8.stack=[]; g8.hist=[]; g8.sel=null; g8.op=null; g8.lock=false;
+  g8Render();
+}
+function g8Render(){
+  const isWin=g8.cur.length===1 && fIs24(g8.cur[0].v);
+  $('g8-nums').innerHTML=g8.cur.map((c,i)=>`<button class="num-card ${g8.sel===i?'picked':''} ${isWin?'final24':''}" onclick="g8Pick(${i})">${c.v[0]}</button>`).join('');
+  $('g8-ops').innerHTML=['+','−','×','÷'].map(o=>`<button class="op-btn ${g8.op===o?'picked':''}" onclick="g8PickOp('${o}')">${o}</button>`).join('');
+  $('g8-hist').innerHTML = g8.hist.length
+    ? g8.hist.map(h=>`<b>${h}</b>`).join(' ')
+    : '👆 还没合并，先点一个数字';
+}
+function g8Tip(msg,cls){
+  const fb=$('g8-fb'); fb.innerHTML=msg; fb.className='feedback '+(cls||'');
+}
+function g8Pick(i){
+  if(g8.lock) return;
+  g8Tip('');
+  if(g8.sel===i){ g8.sel=null; g8Render(); return; }      // 再点一次取消选中
+  if(g8.sel===null || !g8.op){ g8.sel=i; g8Render(); return; } // 选第一个数 / 换第一个数
+  g8Merge(g8.sel,i);                                       // 第二个数：执行合并
+}
+function g8PickOp(o){
+  if(g8.lock) return;
+  if(g8.sel===null){ g8Tip('先点一个数字，再选运算符哦'); return; }
+  g8.op = (g8.op===o)?null:o;
+  g8Render();
+}
+function g8Merge(i,j){
+  const o=g8.op, a=g8.cur[i].v[0], b=g8.cur[j].v[0];
+  let v;
+  if(o==='+') v=fAdd(g8.cur[i].v,g8.cur[j].v);
+  else if(o==='−'){
+    v=fSub(g8.cur[i].v,g8.cur[j].v);
+    if(v[0]<0){ g8Tip('小减大不够减啦！换成大减小，或换一对数字试试 🤔'); return; }
+  }
+  else if(o==='×') v=fMul(g8.cur[i].v,g8.cur[j].v);
+  else{
+    if(b===0){ g8Tip('0 不能当除数哦！'); return; }
+    v=fDiv(g8.cur[i].v,g8.cur[j].v);
+  }
+  if(!fIsInt(v)){ g8Tip('这一步会算出小数，四年级先玩整数！换一种组合试试 🌰'); return; }
+  // 记录快照用于撤销
+  g8.stack.push(JSON.stringify({cur:g8.cur.map(c=>c.v),hist:g8.hist}));
+  g8.hist.push(`${a} ${o} ${b} = ${v[0]}`);
+  g8.cur=g8.cur.filter((_,k)=>k!==i&&k!==j);
+  g8.cur.push({v,e:`${a} ${o} ${b}`});
+  g8.sel=null; g8.op=null;
+  if(g8.cur.length===1){
+    if(fIs24(g8.cur[0].v)){
+      g8.lock=true; g8.score+=10; g8.streak=(g8.streak||0)+1; setStreak('g8',g8.streak);
+      beep('ok'); popScore('+10 ⭐'); confetti();
+      g8Tip(`🎉 恭喜算出 24！<br>你的算式：${g8.cur[0].e.replace(/\(|\)/g,'')} = 24`);
+    }else{
+      g8Tip(`最后算出来是 <b style="color:#b83232">${g8.cur[0].v[0]}</b>，不是 24。点「↩ 撤销一步」换条路，或「🔄 重新开始本题」。`);
+    }
+  }
+  g8Render();
+}
+function g8Undo(){
+  if(g8.lock || !g8.stack.length) return;
+  const s=JSON.parse(g8.stack.pop());
+  g8.cur=s.cur.map(v=>({v,e:String(v[0])}));
+  g8.hist=s.hist; g8.sel=null; g8.op=null;
+  g8Tip(''); g8Render();
+}
+function g8Reset(){
+  if(g8.lock) return;
+  g8.cur=g8.startNums.map(n=>({v:[n,1],e:String(n)}));
+  g8.stack=[]; g8.hist=[]; g8.sel=null; g8.op=null;
+  g8Tip(''); g8Render();
+}
+function g8GiveUp(){
+  if(g8.lock) return;
+  g8.lock=true; g8.streak=0; setStreak('g8',0); beep('no');
+  const clean=g8.sol.replace(/\(|\)/g,'');
+  recordWrong({game:'24点挑战', title:`${g8.startNums.join('、')} 凑 24`, svg:'', user:'没算出来', correct:clean, explain:'参考解法：'+clean+' = 24。小妙招：先想 3×8、4×6、12×2 这几组好朋友，再看剩下的数怎么凑出它们。'});
+  g8Tip(`别灰心！参考解法：<b>${clean} = 24</b><br>很多 24 点解法里都藏着乘法分配律，比如 2×(7+5) = 2×7 + 2×5。`);
+  $('g8-next').classList.remove('hidden');
+  $('g8-next').textContent = g8.q>=g8.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g8Next(){
+  if(g8.q>=g8.total){
+    finishCommon('24点挑战',g8,'凑 24 的诀窍：先想 3×8、4×6、12×2、24+0 这几组"目标"，再用剩下的牌凑出它们。'); 
+  } else g8Ask();
+}
+
 /* ================= 通用结算 ================= */
 function finishCommon(name,g,detail){
   const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
@@ -770,7 +944,7 @@ function applyAnsState(){
   const list=$('wrong-list');
   if(list) list.classList.toggle('hide-ans',hideAns);
 }
-const GAME_NO={'运算顺序':1,'交换律':2,'结合律':3,'分配律正向':4,'分配律反向':5,'简便闯关':6,'大法官':7};
+const GAME_NO={'运算顺序':1,'交换律':2,'结合律':3,'分配律正向':4,'分配律反向':5,'简便闯关':6,'大法官':7,'24点挑战':8};
 function redoWrong(label){
   const n=GAME_NO[label];
   if(n){ startGame(n); fromWrong=true; }

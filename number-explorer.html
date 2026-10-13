@@ -83,6 +83,7 @@
   <!-- ============ 首页 ============ -->
   <div id="home">
     <div class="card">
+      <div class="unit-title">📘 第1单元 · 认识更大的数</div>
       <div class="levels">
         <button class="level-btn l1" onclick="startGame(1)"><span class="icon">🧭</span>数位小专家<span class="desc">数位顺序表，数字站哪一格</span></button>
         <button class="level-btn l2" onclick="startGame(2)"><span class="icon">👄</span>读数大师<span class="desc">分级读数，中间的零怎么读</span></button>
@@ -92,11 +93,14 @@
         <button class="level-btn l6" onclick="startGame(6)"><span class="icon">🔄</span>改写vs近似<span class="desc">易错！= 和 ≈ 别用错</span></button>
         <button class="level-btn l7" onclick="startGame(7)"><span class="icon">🧠</span>概念快问快答<span class="desc">计数单位、自然数、进率</span></button>
         <button class="level-btn l8" onclick="startGame(8)"><span class="icon">📝</span>常见题<span class="desc">数的组成、最大最小数、组卡片、读零</span></button>
+      </div>
+      <div class="unit-title" style="margin-top:18px">✖️ 第3单元 · 乘法</div>
+      <div class="levels">
         <button class="level-btn l9" onclick="startGame(9)"><span class="icon">🚀</span>竖式乘法<span class="desc">三位数×两位数，竖式填空</span></button>
         <button class="level-btn l10" onclick="startGame(10)"><span class="icon">👀</span>估算能手<span class="desc">大数估算，估大还是估小</span></button>
         <button class="level-btn l11" onclick="startGame(11)"><span class="icon">🧩</span>有趣的算式<span class="desc">找规律：回文数、乘9积、缺8数</span></button>
       </div>
-      <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">数位顺序表 + 读数口诀 + 四舍五入</span></button>
+      <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">数位顺序表 + 读数口诀 + 竖式乘法 + 估算</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
     </div>
   </div>

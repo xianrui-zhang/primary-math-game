@@ -53,8 +53,22 @@
   .seg { max-width:480px; margin:12px auto 4px; }
   .seg-top { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:bold; color:#b85c1d; padding:0 4px 4px; }
   .seg-top .dist { color:#185a9d; }
-  .seg-bar { height:12px; border-radius:6px; background:linear-gradient(90deg,#4a90d9 0%,#4a90d9 50%,#f857a6 50%,#f857a6 100%); }
+  .seg-bar { height:12px; border-radius:6px; background:linear-gradient(90deg,#4a90d9 0%,#4a90d9 var(--split,50%),#f857a6 var(--split,50%),#f857a6 100%); }
   .seg-ends { display:flex; justify-content:space-between; font-size:13px; color:#666; margin-top:5px; padding:0 2px; }
+  .seg-track { position:relative; height:36px; }
+  .seg-track .seg-bar { position:absolute; left:0; right:0; top:12px; }
+  .car { position:absolute; top:-7px; font-size:24px; line-height:1; user-select:none; }
+  .car-a { left:0; transform:scaleX(-1); }
+  .car-b { left:100%; transform:translateX(-100%); }
+  .seg-track.run .car-a { animation:driveA var(--dur,1.6s) linear forwards; }
+  .seg-track.run .car-b { animation:driveB var(--dur,1.6s) linear forwards; }
+  @keyframes driveA { from { left:0; } to { left:calc(var(--meet,50%) - 26px); } }
+  @keyframes driveB { from { left:100%; } to { left:calc(var(--meet,50%) + 26px); } }
+  .meet-flash { position:absolute; top:2px; left:var(--meet,50%); transform:translateX(-50%); font-size:20px; opacity:0; }
+  .seg-track.run .meet-flash { animation:flashIn var(--dur,1.6s) linear forwards; }
+  @keyframes flashIn { 0%,96% { opacity:0; transform:translateX(-50%) scale(.5); } 100% { opacity:1; transform:translateX(-50%) scale(1.25); } }
+  .replay-btn { display:block; margin:8px auto 0; border:1.5px solid #c8d6e8; background:#f4f9fd; color:#2b6cb0; border-radius:10px; padding:6px 18px; font-size:13px; cursor:pointer; }
+  .replay-btn:hover { border-color:#4776e6; background:#eaf3fd; }
 </style>
 </head>
 <body>
@@ -387,6 +401,7 @@ function g3Ask(){
     explain=sc[2];
     seg='';
     $('g3-seg').innerHTML='';
+    $('g3-question').textContent=question;
     const opts=shuffleArr([correct,...pool]);
     $('g3-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g3Answer(this)">${o}</button>`).join('');
     g3.correct=correct; g3.explain=explain;
@@ -396,7 +411,9 @@ function g3Ask(){
   while(vb===va) vb=20+5*Math.floor(Math.random()*9);
   const t=2+Math.floor(Math.random()*5);
   const S=(va+vb)*t;
-  seg=`<div class="seg-top"><span>🚗→ 甲车 ${va} 千米/时</span><span class="dist">两地相距 ${S} 千米</span><span>乙车 ${vb} 千米/时 ←🚙</span></div><div class="seg-bar"></div><div class="seg-ends"><span>甲地</span><span>乙地</span></div>`;
+  const meetPct=(Number(va)/(Number(va)+Number(vb))*100).toFixed(1);
+  const dur=Math.max(1.4,Math.min(2.6,t*0.6)).toFixed(2);
+  seg=`<div class="seg-top"><span>🚗→ 甲车 ${va} 千米/时</span><span class="dist">两地相距 ${S} 千米</span><span>乙车 ${vb} 千米/时 ←🚙</span></div><div class="seg-track" id="g3-track" style="--meet:${meetPct}%;--split:${meetPct}%;--dur:${dur}s"><div class="seg-bar"></div><div class="car car-a">🚗</div><div class="car car-b">🚙</div><div class="meet-flash">💥</div></div><div class="seg-ends"><span>甲地</span><span>乙地</span></div><button class="replay-btn" onclick="g3Replay()">▶ 再看一遍动画</button>`;
   if(kind<0.5){ // 求相遇时间
     question=`甲、乙两车同时从两地相向而行，甲车每小时行 ${va} 千米，乙车每小时行 ${vb} 千米。经过多少小时两车相遇？`;
     correct=`${t} 小时`;
@@ -416,8 +433,17 @@ function g3Ask(){
   g3.correct=correct; g3.explain=explain;
   $('g3-question').textContent=question;
   $('g3-seg').innerHTML=seg;
+  const tr=$('g3-track');
+  if(tr) requestAnimationFrame(()=>requestAnimationFrame(()=>tr.classList.add('run')));
   const opts=mkOpts(correct,pool);
   $('g3-options').innerHTML=opts.map(o=>`<button class="opt-btn" data-ok="${o===correct?1:0}" onclick="g3Answer(this)">${o}</button>`).join('');
+}
+function g3Replay(){
+  const tr=$('g3-track');
+  if(!tr) return;
+  tr.classList.remove('run');
+  void tr.offsetWidth;
+  tr.classList.add('run');
 }
 function g3Answer(btn){
   const ok=btn.dataset.ok==='1';

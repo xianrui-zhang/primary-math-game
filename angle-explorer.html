@@ -146,7 +146,7 @@
 <div class="container">
   <button id="sound-toggle" onclick="toggleSound()" title="音效开关">🔊</button>
   <h1>📐 角度探险家</h1>
-  <div class="subtitle">北师大版 · 数学四年级上册 · 第二单元《线与角》 · 玩中学 · v2.2</div>
+  <div class="subtitle">北师大版 · 数学四年级上册 · 第二单元《线与角》 · 玩中学 · v2.3</div>
 
   <!-- ============ 首页 ============ -->
   <div id="home">
@@ -162,6 +162,7 @@
       </div>
       <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">玩游戏前先看一眼，通关更快！</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
+      <a class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#8ba7c9,#5e7ea6);text-decoration:none" href="index.html"><span class="icon">🏠</span>返回游戏乐园<span class="desc">去玩其他数学游戏</span></a>
     </div>
   </div>
 
@@ -434,7 +435,7 @@ function angleSVG(deg, opts={}){
   const rightMark = (opts.showRight && Math.abs(deg-90)<0.5) ? `<rect x="${cx+18}" y="${cy-18}" width="18" height="18" fill="none" stroke="#f7b733" stroke-width="3"/>` : '';
   const label = opts.label ? `<text x="${cx+18}" y="${cy-arcR-8}" font-size="15" fill="#999">${opts.label}</text>` : '';
   const dot = opts.dot ? `<circle cx="${ax}" cy="${ay}" r="13" fill="#ff6b6b" stroke="#fff" stroke-width="3" style="cursor:grab"/>` : '';
-  return `<svg width="340" height="200" viewBox="0 0 340 200">
+  return `<svg width="340" height="200" viewBox="0 0 340 200" style="touch-action:none">
     <line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="#4a6fa5" stroke-width="4" stroke-linecap="round"/>
     <line x1="${cx}" y1="${cy}" x2="${ax}" y2="${ay}" stroke="#ff6b6b" stroke-width="4" stroke-linecap="round"/>
     <circle cx="${cx}" cy="${cy}" r="5" fill="#333"/>
@@ -611,10 +612,10 @@ function g4Init(){
   stage.innerHTML=angleSVG(60,{dot:true,arcR:50});
   const svg=stage.querySelector('svg');
   const dot=svg.querySelector('circle[cursor], circle[style*="cursor"]');
-  g4.bindDrag(svg);
+  g4BindDrag(svg);
   g4Ask();
 }
-g4.bindDrag=function(svg){
+function g4BindDrag(svg){
   const cx=170, cy=150;
   let dragging=false;
   const r=Math.PI/180;
@@ -675,7 +676,7 @@ function g4Ask(){
 function g4Render(){
   const showP=g4.protractor;
   $('g4-stage').innerHTML=`<div style="position:relative">${angleSVG(g4.deg,{dot:true,arcR:50,showRight:true})}${showP?g4ProtractorOverlay():''}</div>`;
-  g4.bindDrag($('g4-stage').querySelector('svg'));
+  g4BindDrag($('g4-stage').querySelector('svg'));
   // 重新绑定后把度数还原到 overlay 上（overlay 是静态的，无影响）
 }
 function g4ProtractorOverlay(){

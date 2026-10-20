@@ -28,6 +28,46 @@
   .l10 { background:linear-gradient(135deg,#4776e6,#8e54e9); }
   .l11 { background:linear-gradient(135deg,#16a085,#f4d03f); }
   .l12 { background:linear-gradient(135deg,#ff9a56,#ff5e62); }
+  .l13 { background:linear-gradient(135deg,#2b5876,#8e54e9); }
+  /* ---- 组数：大U小n 图 ---- */
+  .dg-wrap { text-align:center; }
+  .dg { display:inline-block; background:#f6fbf7; border:1.5px solid #dcefe2; border-radius:14px; padding:10px 14px; margin:8px 0; }
+  .dg-row { display:flex; align-items:center; gap:8px; margin:5px 0; }
+  .dg-tag { font-size:12px; color:#7a8ba3; width:46px; text-align:right; flex:none; }
+  .dg-cell { display:inline-flex; flex-direction:column; align-items:center; width:44px; background:#fff; border:1.5px solid #d8ead9; border-radius:10px; padding:3px 0 2px; }
+  .dg-cell i { font-style:normal; font-size:11px; color:#f7b733; line-height:1.1; }
+  .dg-cell b { font-family:Menlo,Consolas,"Courier New",monospace; font-size:20px; color:#1d7a4a; line-height:1.15; }
+  .dg-cell em { font-style:normal; font-size:10px; color:#9aa8bd; line-height:1.1; }
+  .dg-eq { font-family:Menlo,Consolas,monospace; font-size:17px; color:#185a9d; text-align:center; margin-top:6px; }
+  .digits-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:12px 0; }
+  .digit-chip { width:52px; height:60px; border-radius:14px; background:linear-gradient(135deg,#eafaf0,#d8f0e2); border:2px solid #b8e0c8; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:bold; color:#1d7a4a; font-family:Menlo,Consolas,monospace; }
+  /* ---- 动图演示：大U小n 分步填数 ---- */
+  .dg-cell { position:relative; }
+  .dg-cell:not(.on) b { color:#c9d6cc; }
+  .dg-cell.cur { border-color:#f7b733; box-shadow:0 0 0 3px rgba(247,183,51,.22); }
+  .dg-cell.on b { animation:hdPop .36s ease-out; }
+  .dg-val { font-family:Menlo,Consolas,monospace; font-size:16px; color:#1d7a4a; margin-left:6px; }
+  @keyframes hdPop { 0%{transform:scale(.3);opacity:0;} 65%{transform:scale(1.22);} 100%{transform:scale(1);opacity:1;} }
+  .hd-tabs { display:flex; gap:8px; margin-bottom:10px; }
+  .hd-tab { flex:1; border:1.5px solid #d8ead9; background:#f6fbf7; color:#1d7a4a; border-radius:12px; padding:8px 10px; font-size:14px; font-weight:bold; cursor:pointer; }
+  .hd-tab.on { background:linear-gradient(135deg,#3b8b5b,#1d7a4a); color:#fff; border-color:#1d7a4a; }
+  .hd-narr { font-size:14px; line-height:1.7; margin:0 0 10px; color:#3f5b4a; }
+  .hd-narr b { color:#b85c1d; }
+  .hd-sort { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin:4px 0 10px; }
+  .hd-tag { font-size:12px; color:#7a8ba3; }
+  .hd-chip { position:relative; width:38px; height:44px; border-radius:12px; border:2px dashed #cfd9d0; background:#fff; display:inline-flex; align-items:center; justify-content:center; font-family:Menlo,Consolas,monospace; font-size:20px; font-weight:bold; color:#c2cec5; transition:all .2s; }
+  .hd-chip.on { border-style:solid; border-color:#b8e0c8; background:#eafaf0; color:#1d7a4a; }
+  .hd-chip.cur { border-color:#f7b733; background:#fff8e6; box-shadow:0 0 0 3px rgba(247,183,51,.22); transform:translateY(-4px); }
+  .hd-chip i { position:absolute; top:-9px; right:-7px; font-style:normal; font-size:12px; color:#f7b733; background:#fff; border-radius:9px; padding:0 1px; line-height:1.3; }
+  .hd-eq { text-align:center; font-family:Menlo,Consolas,monospace; font-size:18px; color:#185a9d; margin:10px 0 2px; }
+  .hd-tip { font-size:13px; line-height:1.7; color:#8a7a4a; margin:8px 0 0; }
+  .hd-ctrl { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+  /* ---- 笔迹：把 ①→⑤ 连起来写出 U / n ---- */
+  .dg { position:relative; }
+  svg.dpen { position:absolute; left:0; top:0; pointer-events:none; overflow:visible; }
+  .dpen-line { fill:none; stroke:#ff5e62; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; opacity:.62; transition:stroke-dashoffset 1.1s ease; }
+  svg.dpen.n .dpen-line { stroke:#4776e6; }
+  .hd-origin { font-size:13px; line-height:1.7; color:#b85c1d; text-align:center; margin:4px 0 0; }
   /* ---- 气球速爆 ---- */
   .arena { position:relative; height:300px; background:linear-gradient(180deg,#dff1fb 0%,#f3fbf6 100%); border-radius:16px; overflow:hidden; margin:12px 0 8px; border:2px solid #d8ead9; }
   .balloon { position:absolute; bottom:-120px; border:none; background:none; padding:0; cursor:pointer; animation:rise linear forwards; -webkit-tap-highlight-color:transparent; }
@@ -108,8 +148,9 @@
         <button class="level-btn l10" onclick="startGame(10)"><span class="icon">👀</span>估算能手<span class="desc">大数估算，估大还是估小</span></button>
         <button class="level-btn l11" onclick="startGame(11)"><span class="icon">🧩</span>有趣的算式<span class="desc">找规律：回文数、乘9积、缺8数</span></button>
         <button class="level-btn l12" onclick="startGame(12)"><span class="icon">🎈</span>气球速爆<span class="desc">限时口算，爆掉正确的气球！</span></button>
+        <button class="level-btn l13" onclick="startGame(13)"><span class="icon">🔢</span>组数达人<span class="desc">5 个数字组三位数×两位数，求最大/最小积</span></button>
       </div>
-      <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">数位顺序表 + 读数口诀 + 竖式乘法 + 估算</span></button>
+      <button class="level-btn card-btn" style="margin-top:14px" onclick="showKnowledge()"><span class="icon">📖</span>知识点秘籍卡<span class="desc">竖式乘法 + 估算 + 大U小n 组数法（含现场演示）</span></button>
       <button class="level-btn card-btn" style="margin-top:12px;background:linear-gradient(135deg,#e08a8a,#b85252)" onclick="showWrongBook()"><span class="icon">📕</span>我的错题本<span class="desc">做错的题自动收进来，共 <span id="wrong-count">0</span> 道</span></button>
     </div>
   </div>
@@ -123,6 +164,16 @@
         ⭕ <b>末尾有 0 的简便写法：</b>先把 0 前面的数相乘，因数末尾一共几个 0，就在积的末尾添几个 0。如 120×40：先算 12×4=48，再添 2 个 0 → 4800。<br>
         🎯 <b>估算：</b>把大数看成整十、整百数再乘。<b>看大了估出来偏大，看小了偏小</b>；题目问"大约"才估算，问"等于"要精算。<br>
         🧩 <b>有趣的算式：</b>111111×111111=12345654321（回文数）；99999×99999=9999800001；缺 8 数 12345679×9=111111111。
+      </div>
+      <div class="tip" style="background:#eef4ff;border-left-color:#4776e6">
+        🔢 <b>用 5 个数字组成"三位数 × 两位数"，求乘积最大 / 最小 —— 大 U 小 n 法：</b><br>
+        <b>第一步 排序：</b>求最大就<b>从大到小</b>排，求最小就<b>从小到大</b>排，得到 a b c d e。<br>
+        <b>第二步 大 U 法（求最大）：</b>①a→两位数的十位 ②b→三位数的百位 ③c→三位数的十位 ④d→两位数的个位 ⑤e→三位数的个位。<br>
+        <b>第二步 小 n 法（求最小）：</b>①a→两位数的十位 ②b→三位数的百位 ③c→两位数的个位 ④d→三位数的十位 ⑤e→三位数的个位。<br>
+        <b>例：</b>1、2、3、4、5 → 最大 431×52=22412；最小 245×13=3185。<br>
+        ⚠️ 数字里出现 <b>0</b> 时，0 不能放在最高位（三位数的百位、两位数的十位），要把它换到后面的位置。<br>
+        ▶ 想一步步看数字怎么飞进格子里？进「组数达人」关卡，点 <b>📖 大U小n 方法速查（动图演示）</b>。
+        <div id="kn-demo"></div>
       </div>
       <button class="big-btn" onclick="showHome()">我知道啦，去闯关！🚀</button>
     </div>
@@ -201,6 +252,38 @@
     </div>
   </div>
 
+  <!-- ============ 游戏 13：组数达人 ============ -->
+  <div id="game13" class="hidden">
+    <div class="card">
+      <div class="game-header">
+        <span class="badge">第 <span id="g13-q">1</span>/8 题</span>
+        <span class="badge">⭐ 得分：<span id="g13-score">0</span></span>
+        <span class="badge hidden" id="g13-streak">🔥 连对 ×2</span>
+        <button class="back-btn" onclick="quitToHome()">← 返回</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="g13-bar"></div></div>
+      <div style="text-align:center"><button class="small-btn" onclick="toggleG13Help()">📖 大U小n 方法速查（动图演示）</button></div>
+      <div id="g13-help" class="tip hidden" style="margin-top:10px">
+        <div class="hd-tabs">
+          <button class="hd-tab on" id="hd-tab-max" onclick="g13HelpTab('max')">求最大 · 大 U 法</button>
+          <button class="hd-tab" id="hd-tab-min" onclick="g13HelpTab('min')">求最小 · 小 n 法</button>
+        </div>
+        <div id="hd-body"></div>
+        <div class="hd-ctrl">
+          <button class="small-btn" onclick="g13DemoPrev()">← 上一步</button>
+          <button class="small-btn" onclick="g13DemoPlay()">▶ 自动演示</button>
+          <button class="small-btn" onclick="g13DemoNext()">下一步 →</button>
+          <button class="small-btn" onclick="g13DemoReset()">↺ 重来</button>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:16px;margin:14px 0 0" id="g13-question"></p>
+      <div class="digits-row" id="g13-digits"></div>
+      <div class="options" id="g13-options"></div>
+      <div class="feedback" id="g13-fb"></div>
+      <button class="big-btn hidden" id="g13-next" onclick="g13Next()">下一题 →</button>
+    </div>
+  </div>
+
   <!-- ============ 错题本 ============ -->
   <div id="wrongbook" class="hidden">
     <div class="card">
@@ -231,14 +314,14 @@
 <script>
 /* ================= 通用 ================= */
 const $ = id => document.getElementById(id);
-const screens = ['home','knowledge','game9','game10','game11','game12','wrongbook','result'];
+const screens = ['home','knowledge','game9','game10','game11','game12','game13','wrongbook','result'];
 function showScreen(name){ if(name!=='game12') g12Stop(); screens.forEach(s=>$(s).classList.add('hidden')); $(name).classList.remove('hidden'); window.scrollTo(0,0); if(name==='result'){ confetti(); beep('win'); const rb=$('r-back'); if(rb)rb.textContent = fromWrong ? '返回错题本 📕' : '返回首页 🏠'; } if(name==='home')updateWrongCount(); }
 function showHome(){ showScreen('home'); }
-function showKnowledge(){ showScreen('knowledge'); }
+function showKnowledge(){ showScreen('knowledge'); renderKnDemo(); }
 let fromWrong=false;
 function quitToHome(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
 function resultBack(){ if(fromWrong){ fromWrong=false; showWrongBook(); } else showHome(); }
-function startGame(n){ fromWrong=false; showScreen('game'+n); [g9Init,g10Init,g11Init,g12Init][n-9](); }
+function startGame(n){ fromWrong=false; showScreen('game'+n); [g9Init,g10Init,g11Init,g12Init,g13Init][n-9](); }
 
 /* ================= 趣味元素：音效 / 飘字 / 撒花 / 连对 ================= */
 let soundOn = true;
@@ -624,6 +707,236 @@ function g12Next(){
   else g12Ask();
 }
 
+/* ================= 游戏 13：组数达人（大U小n法） ================= */
+let g13 = {};
+const CIRC = ['①','②','③','④','⑤'];
+/* 按"大U / 小n"的填数规则，把 5 个数字排成 三位数 × 两位数 */
+function groupFields(digits, mode){
+  const asc = [...digits].sort((x,y)=>x-y);
+  const s = mode==='max' ? asc.slice().reverse() : asc;
+  const two = [], three = [];
+  const P = (d,place,i,num) => ({d,place,i,num});
+  if(mode==='max'){
+    two.push(P(s[0],'十位',1,'两位数'));
+    three.push(P(s[1],'百位',2,'三位数'));
+    three.push(P(s[2],'十位',3,'三位数'));
+    two.push(P(s[3],'个位',4,'两位数'));
+    three.push(P(s[4],'个位',5,'三位数'));
+  }else{
+    two.push(P(s[0],'十位',1,'两位数'));
+    three.push(P(s[1],'百位',2,'三位数'));
+    two.push(P(s[2],'个位',3,'两位数'));
+    three.push(P(s[3],'十位',4,'三位数'));
+    three.push(P(s[4],'个位',5,'三位数'));
+  }
+  const a = +(''+three[0].d+three[1].d+three[2].d);
+  const b = +(''+two[0].d+two[1].d);
+  return {s,two,three,a,b,p:a*b};
+}
+/* 排序后的数字 + ①②③④⑤ 编号（第几个数 → 填哪里） */
+function groupChipsHTML(s){
+  return `<div class="hd-sort" style="justify-content:center"><span class="hd-tag">排序并编号</span>`
+    + s.map((d,k)=>`<span class="hd-chip on">${d}<i>${CIRC[k]}</i></span>`).join('')
+    + `</div>`;
+}
+function groupDiagHTML(digits, mode){
+  const f = groupFields(digits, mode);
+  const cell = c => `<span class="dg-cell on" data-i="${c.i}"><i>${CIRC[c.i-1]}</i><b>${c.d}</b><em>${c.place}</em></span>`;
+  return `<div class="dg-wrap"><div class="dg">
+    <div class="dg-row"><span class="dg-tag">两位数</span>${f.two.map(cell).join('')}<span class="dg-val">→ ${f.b}</span></div>
+    <div class="dg-row"><span class="dg-tag">三位数</span>${f.three.map(cell).join('')}<span class="dg-val">→ ${f.a}</span></div>
+  </div></div>`;
+}
+/* 枚举全部排法，按积从大到小；用来出干扰项 + 校验大U/小n的结果 */
+function groupAllProducts(digits){
+  const seen = new Set(), out = [];
+  (function go(rest, cur){
+    if(rest.length === 0){
+      const a = cur[0]*100+cur[1]*10+cur[2], b = cur[3]*10+cur[4], p = a*b;
+      if(seen.has(p)) return;
+      seen.add(p); out.push({a,b,p});
+      return;
+    }
+    for(let i=0;i<rest.length;i++){ cur.push(rest[i]); go(rest.slice(0,i).concat(rest.slice(i+1)), cur); cur.pop(); }
+  })(digits, []);
+  return out.sort((x,y)=>y.p-x.p);
+}
+function g13Init(){ g13={q:0,score:0,total:8,streak:0}; $('g13-help').classList.add('hidden'); hdReset(); g13Ask(); }
+function g13Ask(){
+  clearInterval(HD.timer); HD.timer=null; HD.step=0;
+  g13.q++;
+  $('g13-q').textContent=g13.q; $('g13-score').textContent=g13.score;
+  $('g13-bar').style.width=((g13.q-1)/g13.total*100)+'%';
+  $('g13-fb').textContent=''; $('g13-fb').className='feedback'; $('g13-next').classList.add('hidden');
+  let digits, arrs, mode, best;
+  for(let guard=0; guard<20; guard++){                 // 规则结果必须与枚举结果一致才出题
+    digits = shuffleArr([1,2,3,4,5,6,7,8,9]).slice(0,5);
+    arrs = groupAllProducts(digits);
+    mode = Math.random()<0.5 ? 'max' : 'min';
+    best = mode==='max' ? arrs[0] : arrs[arrs.length-1];
+    if(groupFields(digits,mode).p === best.p) break;
+  }
+  const f = groupFields(digits, mode);
+  g13.mode = mode;
+  const ord = mode==='max' ? '从大到小' : '从小到大';
+  const method = mode==='max' ? '大 U 法' : '小 n 法';
+  g13.correctText = `${f.a} × ${f.b}`;
+  g13.explain = `<br><b>${method}　第 1 步 ${ord}排序、编号：</b>`
+    + groupChipsHTML(f.s)
+    + `<b>第 2 步 按 ①→⑤ 的顺序填进图里（每个格子上的小圈就是填的先后顺序）：</b>`
+    + groupDiagHTML(digits,mode)
+    + `<p class="hd-origin">✍️ 把 ①→②→③→④→⑤ 连起来，正好写出一个「${mode==='max'?'U':'n'}」。</p>`
+    + `${f.a} × ${f.b} = <b>${f.p}</b>，就是${mode==='max'?'最大':'最小'}的乘积。`
+    + (mode==='max'
+        ? '口诀：最大的数坐两位数的十位，第二大的坐三位数的百位，两个数才最"般配"。'
+        : '口诀：最小的数坐两位数的十位，第二小的坐三位数的百位，两个数拉得最开，积才最小。');
+  g13.explainText = `${method}：${ord}排 ${f.s.join(' ')}；①两位数十位=${f.s[0]}，②三位数百位=${f.s[1]}，`
+    + `③${mode==='max'?'三位数十位':'两位数个位'}=${f.s[2]}，④${mode==='max'?'两位数个位':'三位数十位'}=${f.s[3]}，`
+    + `⑤三位数个位=${f.s[4]}，得 ${f.a}×${f.b}=${f.p}。`;
+  $('g13-question').textContent = `用这 5 个数字组成"三位数 × 两位数"，乘积${mode==='max'?'最大':'最小'}的算式是？`;
+  $('g13-digits').innerHTML = digits.map(d=>`<span class="digit-chip">${d}</span>`).join('');
+  const near = mode==='max' ? arrs.slice(1,12) : arrs.slice(-12,-1);
+  const opts = [g13.correctText], usedTxt = new Set([g13.correctText]);
+  for(const c of shuffleArr(near.slice())){
+    if(opts.length>=4) break;
+    const t = `${c.a} × ${c.b}`;
+    if(usedTxt.has(t)) continue;
+    usedTxt.add(t); opts.push(t);
+  }
+  shuffleArr(opts);
+  $('g13-options').innerHTML = opts.map(o=>`<button class="opt-btn" data-ok="${o===g13.correctText?1:0}" onclick="g13Answer(this)">${o}</button>`).join('');
+}
+function g13Answer(btn){
+  const ok = btn.dataset.ok==='1';
+  markResult(g13.correctText, [...$('g13-options').querySelectorAll('.opt-btn')], btn, $('g13-fb'), g13.explain);
+  const fbDg = $('g13-fb').querySelector('.dg');
+  if(fbDg) penDraw(fbDg, g13.mode, 1, 0);
+  if(ok){ g13.score+=10; g13.streak=(g13.streak||0)+1; setStreak('g13',g13.streak); beep('ok'); popScore('+10 ⭐'); }
+  else{
+    g13.streak=0; setStreak('g13',0); beep('no');
+    recordWrong({game:'组数', title:'组数：'+[...$('g13-digits').querySelectorAll('.digit-chip')].map(x=>x.textContent).join('、'), svg:'', user:btn.textContent, correct:g13.correctText, explain:g13.explainText});
+  }
+  $('g13-score').textContent=g13.score;
+  $('g13-next').classList.remove('hidden');
+  $('g13-next').textContent = g13.q>=g13.total ? '看看成绩 🏆' : '下一题 →';
+}
+function g13Next(){
+  if(g13.q>=g13.total){ finishCommon('组数达人',g13,'组数：求最大用大 U 法（从大到小排，①两位数十位 ②三位数百位 ③三位数十位 ④两位数个位 ⑤三位数个位）；求最小用小 n 法（从小到大排，③、④换个位置）。'); }
+  else g13Ask();
+}
+/* ---------------- 方法速查：分步"动图"演示（举例 6、2、8、4、5） ---------------- */
+const HD = { mode:'max', step:0, timer:null, digits:[6,2,8,4,5] };
+const HD_STEPS = 6;                       // 0 排序 → 1~5 依次填①~⑤ → 6 读结果
+function hdReset(){
+  clearInterval(HD.timer); HD.timer=null; HD.mode='max'; HD.step=0;
+  const a=$('hd-tab-max'), b=$('hd-tab-min');
+  if(a) a.classList.add('on');
+  if(b) b.classList.remove('on');
+}
+function g13HelpTab(mode){
+  clearInterval(HD.timer); HD.timer=null;
+  HD.mode=mode; HD.step=0;
+  $('hd-tab-max').classList.toggle('on', mode==='max');
+  $('hd-tab-min').classList.toggle('on', mode==='min');
+  renderHDemo();
+}
+function toggleG13Help(){
+  const el=$('g13-help');
+  el.classList.toggle('hidden');
+  if(!el.classList.contains('hidden')){ HD.step=0; renderHDemo(); }
+}
+function hdFields(){ return groupFields(HD.digits, HD.mode); }
+function hdNarrate(){
+  const f=hdFields(), isMax=HD.mode==='max';
+  if(HD.step===0){
+    return `第 1 步：排序。求${isMax?'最大 → 从大到小':'最小 → 从小到大'}排成 <b>${f.s.join(' ')}</b>，从左到右编上号 ①②③④⑤。`;
+  }
+  if(HD.step<=5){
+    const c=f.two.concat(f.three).find(x=>x.i===HD.step);
+    const high=(c.num==='两位数'&&c.place==='十位')||(c.num==='三位数'&&c.place==='百位');
+    return `第 ${HD.step+1} 步：把 <b>${CIRC[HD.step-1]} ${c.d}</b> 填进「${c.num}」的<b>${c.place}</b>${high?'（这是'+c.num+'的最高位，所以放最重要的一位数）':''}。`;
+  }
+  return `第 7 步：读出来 —— 两位数 <b>${f.b}</b>，三位数 <b>${f.a}</b>，${f.a} × ${f.b} = <b>${f.p}</b>，这就是乘积最${isMax?'大':'小'}的算式。看！把 ①→②→③→④→⑤ 连起来，正好写出一个「${HD.mode==='max'?'U':'n'}」。`;
+}
+/* 在填数图上用笔迹把 ①→⑤ 连起来（写出 U 或 n） */
+const SVGNS = 'http://www.w3.org/2000/svg';
+function penDraw(dg, mode, frac, prev){
+  if(!dg) return;
+  const pts = [];
+  [...dg.querySelectorAll('.dg-cell')].forEach(c=>{
+    const i = +c.dataset.i;
+    if(i) pts[i-1] = {x:c.offsetLeft + c.offsetWidth/2, y:c.offsetTop + c.offsetHeight/2};
+  });
+  if(pts.length < 5 || pts.some(p=>!p)) return;
+  const old = dg.querySelector('svg.dpen'); if(old) old.remove();
+  const svg = document.createElementNS(SVGNS,'svg');
+  svg.setAttribute('class','dpen' + (mode==='min' ? ' n' : ''));
+  svg.setAttribute('width', dg.offsetWidth);
+  svg.setAttribute('height', dg.offsetHeight);
+  const path = document.createElementNS(SVGNS,'path');
+  path.setAttribute('class','dpen-line');
+  path.setAttribute('d', pts.map((q,k)=>(k?'L':'M') + q.x.toFixed(1) + ' ' + q.y.toFixed(1)).join(' '));
+  svg.appendChild(path);
+  dg.appendChild(svg);
+  const L = path.getTotalLength();
+  path.style.strokeDasharray = L;
+  path.style.transition = 'none';
+  path.style.strokeDashoffset = L * (1 - (prev||0));
+  requestAnimationFrame(()=>{ path.style.transition=''; path.style.strokeDashoffset = L * (1 - frac); });
+}
+function renderHDemo(){
+  const body=$('hd-body'); if(!body) return;
+  const f=hdFields(), isMax=HD.mode==='max', done=HD.step>=HD_STEPS;
+  const cell=c=>{
+    const shown=c.i<=HD.step;
+    return `<span class="dg-cell ${shown?'on':''} ${c.i===HD.step?'cur':''}" data-i="${c.i}"><i>${CIRC[c.i-1]}</i><b>${shown?c.d:'·'}</b><em>${c.place}</em></span>`;
+  };
+  const chips=f.s.map((d,k)=>`<span class="hd-chip ${k+1<=HD.step?'on':''} ${k+1===HD.step?'cur':''}">${d}<i>${CIRC[k]}</i></span>`).join('');
+  body.innerHTML = `<p class="hd-narr">${hdNarrate()}</p>
+    <div class="hd-sort"><span class="hd-tag">排序编号</span>${chips}</div>
+    <div class="dg-wrap"><div class="dg">
+      <div class="dg-row"><span class="dg-tag">两位数</span>${f.two.map(cell).join('')}<span class="dg-val">${done?'→ '+f.b:''}</span></div>
+      <div class="dg-row"><span class="dg-tag">三位数</span>${f.three.map(cell).join('')}<span class="dg-val">${done?'→ '+f.a:''}</span></div>
+    </div></div>
+    ${done?`<p class="hd-origin">✍️ 顺着 ①→②→③→④→⑤ 连起来，正好写出一个「${isMax?'U':'n'}」—— 这就是${isMax?'大 U':'小 n'} 法。</p>`:''}
+    <div class="hd-eq ${done?'':'hidden'}">${f.a} × ${f.b} = <b>${f.p}</b>　←　乘积最${isMax?'大':'小'}</div>
+    <p class="hd-tip">${isMax
+      ? '口诀：最大的数坐「两位数」的十位，第二大的坐「三位数」的百位，两个数才最"般配"，积最大。'
+      : '口诀：最小的数坐「两位数」的十位，第二小的坐「三位数」的百位，两个数拉得最开，积最小。'}</p>`;
+  penDraw(body.querySelector('.dg'), HD.mode, done?1:0, 0);
+}
+function g13DemoNext(){ clearInterval(HD.timer); HD.timer=null; if(HD.step<HD_STEPS){ HD.step++; renderHDemo(); } }
+function g13DemoPrev(){ clearInterval(HD.timer); HD.timer=null; if(HD.step>0){ HD.step--; renderHDemo(); } }
+function g13DemoReset(){ clearInterval(HD.timer); HD.timer=null; HD.step=0; renderHDemo(); }
+function g13DemoPlay(){
+  clearInterval(HD.timer);
+  if(HD.step>=HD_STEPS) HD.step=0;
+  renderHDemo();
+  HD.timer=setInterval(()=>{
+    if(HD.step>=HD_STEPS){ clearInterval(HD.timer); HD.timer=null; return; }
+    HD.step++; renderHDemo();
+  }, 1000);
+}
+/* 秘籍卡里的实时演示 */
+function renderKnDemo(){
+  const el=$('kn-demo'); if(!el) return;
+  const digits=shuffleArr([1,2,3,4,5,6,7,8,9]).slice(0,5);
+  const mx=groupFields(digits,'max'), mn=groupFields(digits,'min');
+  el.innerHTML = `<div style="text-align:center;margin-top:12px;font-size:14px;color:#666">换一组数字现场演示：<b style="font-size:18px;color:#1d7a4a">${digits.join('、')}</b></div>
+    <div class="dg-eq" style="margin-top:12px"><b>求最大 · 大 U 法</b>（${mx.s.join(' ')}）</div>
+    ${groupDiagHTML(digits,'max')}
+    <div class="dg-eq">${mx.a} × ${mx.b} = <b>${mx.p}</b></div>
+    <div class="dg-eq" style="margin-top:16px"><b>求最小 · 小 n 法</b>（${mn.s.join(' ')}）</div>
+    ${groupDiagHTML(digits,'min')}
+    <div class="dg-eq">${mn.a} × ${mn.b} = <b>${mn.p}</b></div>
+    <div style="text-align:center;margin-top:12px"><button class="small-btn" onclick="renderKnDemo()">🔄 换一组数字</button></div>`;
+  requestAnimationFrame(()=>{
+    const dgs=el.querySelectorAll('.dg');
+    if(dgs[0]) penDraw(dgs[0],'max',1,0);
+    if(dgs[1]) penDraw(dgs[1],'min',1,0);
+  });
+}
+
 /* ================= 通用结算 ================= */
 function finishCommon(name,g,detail){
   const max=g.total*10, pct=g.score/max, stars=pct>=0.85?3:(pct>=0.6?2:1);
@@ -717,7 +1030,7 @@ function applyAnsState(){
   const list=$('wrong-list');
   if(list) list.classList.toggle('hide-ans',hideAns);
 }
-const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8,'竖式':9,'估算':10,'规律':11,'速爆':12};
+const GAME_NO={'数位':1,'读数':2,'写数':3,'比大小':4,'四舍五入':5,'改写近似':6,'概念':7,'常见':8,'竖式':9,'估算':10,'规律':11,'速爆':12,'组数':13};
 function redoWrong(label){
   const n=GAME_NO[label];
   if(n){ startGame(n); fromWrong=true; }
